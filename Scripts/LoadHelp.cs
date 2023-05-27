@@ -9,11 +9,11 @@ public class LoadHelp : MonoBehaviour
     private string previousSceneName; // The name of the previous scene
     private Camera myCamera;
     private Vector3 cameraPosition;
+    private Quaternion cameraRotation;
 
     private void Start()
     {
         previousSceneName = SceneManager.GetActiveScene().name;
-        Debug.Log("Active scene name: " + previousSceneName);
 
         // Save camera position
         myCamera = Camera.main;
@@ -26,12 +26,17 @@ public class LoadHelp : MonoBehaviour
             // Get the position of the camera
             cameraPosition = myCamera.transform.position;
 
+            // Get the rotation of the camera
+            cameraRotation = myCamera.transform.rotation;
+            Debug.Log("CameraRotation LoadHelp.cs:" + cameraRotation);
+
             // Load scene
             SceneManager.LoadScene(sceneName);
 
             // Send params to HELP
             PlayerPrefs.SetString("previousSceneName", previousSceneName);
             PlayerPrefs.SetString("cameraPosition", cameraPosition.ToString());
+            PlayerPrefs.SetString("cameraRotation", cameraRotation.ToString());
         }
     }
 }

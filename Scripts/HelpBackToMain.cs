@@ -7,13 +7,16 @@ public class HelpBackToMain : MonoBehaviour
 {
     private string previousSceneName;
     private string cameraPosition;
+    private string cameraRotation;
 
     private void Start()
     {
         previousSceneName = PlayerPrefs.GetString("previousSceneName");
-        Debug.Log("previousSceneName: " + previousSceneName);
+        Debug.Log("previousSceneName HelpBackToMain.cs: " + previousSceneName);
         cameraPosition = PlayerPrefs.GetString("cameraPosition");
-        Debug.Log("cameraPosition: " + cameraPosition);
+        Debug.Log("cameraPosition HelpBackToMain.cs: " + cameraPosition);
+        cameraRotation = PlayerPrefs.GetString("cameraRotation");
+        Debug.Log("cameraRotation HelpBackToMain.cs: " + cameraRotation);
     }
 
     private void Update()
@@ -21,7 +24,12 @@ public class HelpBackToMain : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.H))
         {
             SceneManager.LoadScene(previousSceneName);
-            PlayerPrefs.SetString("cameraPosition", cameraPosition);
+
+            string combinedParameters = string.Join("|", cameraPosition, cameraRotation);
+
+            PlayerPrefs.SetString("combinedParameters", combinedParameters);
+            // PlayerPrefs.SetString("cameraRotation", cameraRotation);
+            Debug.Log("cameraRotation HelpBackToMain 2.cs: " + cameraRotation);
         }
     }
 }
