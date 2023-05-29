@@ -9,7 +9,22 @@ public class CameraController : MonoBehaviour
     public float maxYAngle = 80f;   // Maximum vertical angle for camera rotation
 
     private float rotationX = 0f;
-    private bool isRightMouseButtonPressed = false;
+    public bool isRightMouseButtonPressed = false;
+
+    // Vector3 position = new Vector3(-1.305f, -0.486f, 1.258f);
+    // Quaternion rotation = Quaternion.Euler(31.4f, -90f, 0f);
+    // Camera mainCamera;
+
+    // private void Start()
+    // {
+    //     Camera mainCamera = Camera.main;
+
+    //     // Set position
+    //     mainCamera.transform.position = position;
+
+    //     // Set rotation
+    //     mainCamera.transform.rotation = rotation;
+    // }
 
     private void Update()
     {
