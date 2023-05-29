@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+// This is used in the HELP Scene
+
 public class HelpBackToMain : MonoBehaviour
 {
     private string previousSceneName;
