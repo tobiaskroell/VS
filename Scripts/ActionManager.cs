@@ -2,15 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 
-public class ActionManager : MonoBehaviour
+public class ActionManager : MonoBehaviour, IPointerClickHandler
 {
 
     // public GameObject pregnancyJewelry01;
     // public GameObject explainProcedure02;
     // public GameObject patientPositioning03;
-    // public GameObject radioProtection04;
+    // public GameObject radiationProtection04;
     // public GameObject xrayPositioning05;
     // public GameObject placeMarker06;
     // public GameObject instructPatient07;
@@ -19,10 +21,9 @@ public class ActionManager : MonoBehaviour
     // public GameObject checkPicture10;
 
     public GameObject actionItem; // Can be helpIcon or actionItem from list
-    private TextMeshProUGUI errorScore;
-    private TextMeshProUGUI helpScore;
     public GameState currentState;     // The current game state
-    public static ActionManager Instance { get; private set; }
+
+    // public static ActionManager Instance { get; private set; }
 
     // Define enum for game states
     public enum GameState
@@ -31,7 +32,7 @@ public class ActionManager : MonoBehaviour
         PregnancyJewelry01,
         ExplainProcedure02,
         PatientPositioning03,
-        RadioProtection04,
+        RadiationProtection04,
         XrayPositioning05,
         PlaceMarker06,
         InstructPatient07,
@@ -40,56 +41,35 @@ public class ActionManager : MonoBehaviour
         CheckPicture10
     }
 
-    private void Awake()
+    // private void Awake()
+    // {
+    //    if (Instance == null)
+    //     {
+    //         Instance = this;
+    //         DontDestroyOnLoad(gameObject);
+
+    //         // If this gameObject has a parent, we should detach it to ensure it is a root gameObject.
+    //         if (transform.parent != null)
+    //         {
+    //             transform.parent = null;
+    //         }
+    //     }
+    //     else if (Instance != this)
+    //     {
+    //         Debug.Log("Duplicate instance of ActionManager detected, destroying it.");
+    //         Destroy(gameObject);
+    //         return;
+    //     }
+    // }
+
+    private void Start()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-            return;
-        }
+        currentState = GameState.PregnancyJewelry01;
     }
 
-    void Start()
+    private void OnMouseDown()
     {
-        // // Find the ErrorScore and HelpScore object by name
-        // GameObject targetObject = GameObject.Find("");
-
-        // // Check if the GameObject was found
-        // if (targetObject != null)
-        // {
-        //     // Get the TextMeshProUGUI component from the found GameObject
-        //     targetText = targetObject.GetComponent<TextMeshProUGUI>();
-
-        //     // Check if the TextMeshProUGUI component was found
-        //     if (targetText != null)
-        //     {
-        //         // Use the targetText variable as needed
-        //         Debug.Log("Found TextMeshPro GameObject: " + targetObject.name);
-        //     }
-        //     else
-        //     {
-        //         Debug.Log("TextMeshPro component not found on GameObject: " + targetObject.name);
-        //     }
-        // }
-        // else
-        // {
-        //     Debug.Log("GameObject not found.");
-        // }
-
-
-
-        currentState = GameState.PreActionMenu00;
-    }
-
-
-    // Called once per frame
-    void Update()
-    {
+        Debug.Log("Object clicked!");
         switch (currentState)
         {
             case GameState.PreActionMenu00:
@@ -97,52 +77,278 @@ public class ActionManager : MonoBehaviour
                 break;
 
             case GameState.PregnancyJewelry01:
-                Debug.Log("Gamestate: " + currentState);
-                Debug.Log("Object name: " + actionItem.name);
-
-                if (Input.GetMouseButtonDown(0) && actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
-                    int currentHelpScore = ScoreManager.Instance.helpScore;
-                    helpScore.text = currentHelpScore.ToString();
-
                     break;
                 }
 
-                else if (Input.GetMouseButtonDown(0) && actionItem.name != "pregnancyJewelry01")
+                else if (actionItem.name != "pregnancyJewelry01")
                 {
                     ScoreManager.Instance.IncreaseErrorScore(1);
-                    int currentErrorScore = ScoreManager.Instance.errorScore;
-                    errorScore.text = currentErrorScore.ToString();
                 }
 
                 break;
             case GameState.ExplainProcedure02:
-                // Code to handle ExplainProcedure02 state
+                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+                {
+                    ScoreManager.Instance.IncreaseHelpScore(1);
+                    break;
+                }
+
+                if (actionItem.name != "explainProcedure02")
+                {
+                    ScoreManager.Instance.IncreaseErrorScore(1);
+                }
+
                 break;
             case GameState.PatientPositioning03:
-                // Code to handle PatientPositioning03 state
+                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+                {
+                    ScoreManager.Instance.IncreaseHelpScore(1);
+                    break;
+                }
+
+                if (actionItem.name != "patientPositioning03")
+                {
+                    ScoreManager.Instance.IncreaseErrorScore(1);
+                }
+
                 break;
-            case GameState.RadioProtection04:
-                // Code to handle RadioProtection04 state
+            case GameState.RadiationProtection04:
+                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+                {
+                    ScoreManager.Instance.IncreaseHelpScore(1);
+                    break;
+                }
+
+                if (actionItem.name != "apronWallBlue")
+                {
+                    ScoreManager.Instance.IncreaseErrorScore(1);
+                }
+
                 break;
             case GameState.XrayPositioning05:
-                // Code to handle XrayPositioning05 state
+                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+                {
+                    ScoreManager.Instance.IncreaseHelpScore(1);
+                    break;
+                }
+
+                if (actionItem.name != "Frontplate")
+                {
+                    ScoreManager.Instance.IncreaseErrorScore(1);
+                }
+
                 break;
             case GameState.PlaceMarker06:
-                // Code to handle PlaceMarker06 state
+                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+                {
+                    ScoreManager.Instance.IncreaseHelpScore(1);
+                    break;
+                }
+
+                if (actionItem.name != "xlaceMarker06")
+                {
+                    ScoreManager.Instance.IncreaseErrorScore(1);
+                }
+
                 break;
             case GameState.InstructPatient07:
-                // Code to handle InstructPatient07 state
+                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+                {
+                    ScoreManager.Instance.IncreaseHelpScore(1);
+                    break;
+                }
+
+                if (actionItem.name != "instructPatient07")
+                {
+                    ScoreManager.Instance.IncreaseErrorScore(1);
+                }
+
                 break;
             case GameState.LeaveRoom08:
-                // Code to handle LeaveRoom08 state
+                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+                {
+                    ScoreManager.Instance.IncreaseHelpScore(1);
+                    break;
+                }
+
+                if (actionItem.name != "leaveRoom08")
+                {
+                    ScoreManager.Instance.IncreaseErrorScore(1);
+                }
+
                 break;
             case GameState.StartXray09:
-                // Code to handle StartXray09 state
+                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+                {
+                    ScoreManager.Instance.IncreaseHelpScore(1);
+                    break;
+                }
+
+                if (actionItem.name != "startXray09")
+                {
+                    ScoreManager.Instance.IncreaseErrorScore(1);
+                }
+
                 break;
             case GameState.CheckPicture10:
-                // Code to handle CheckPicture10 state
+                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+                {
+                    ScoreManager.Instance.IncreaseHelpScore(1);
+                    break;
+                }
+
+                if (actionItem.name != "checkPicture10")
+                {
+                    ScoreManager.Instance.IncreaseErrorScore(1);
+                }
+
+                break;
+        }
+    }
+    
+
+    // This function is called when the Panel is clicked
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        Debug.Log("Object clicked!");
+        switch (currentState)
+        {
+            case GameState.PreActionMenu00:
+
+                break;
+
+            case GameState.PregnancyJewelry01:
+                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+                {
+                    ScoreManager.Instance.IncreaseHelpScore(1);
+                    break;
+                }
+
+                else if (actionItem.name != "pregnancyJewelry01")
+                {
+                    ScoreManager.Instance.IncreaseErrorScore(1);
+                }
+
+                break;
+            case GameState.ExplainProcedure02:
+                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+                {
+                    ScoreManager.Instance.IncreaseHelpScore(1);
+                    break;
+                }
+
+                if (actionItem.name != "explainProcedure02")
+                {
+                    ScoreManager.Instance.IncreaseErrorScore(1);
+                }
+
+                break;
+            case GameState.PatientPositioning03:
+                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+                {
+                    ScoreManager.Instance.IncreaseHelpScore(1);
+                    break;
+                }
+
+                if (actionItem.name != "patientPositioning03")
+                {
+                    ScoreManager.Instance.IncreaseErrorScore(1);
+                }
+
+                break;
+            case GameState.RadiationProtection04:
+                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+                {
+                    ScoreManager.Instance.IncreaseHelpScore(1);
+                    break;
+                }
+
+                if (actionItem.name != "apronWallBlue")
+                {
+                    ScoreManager.Instance.IncreaseErrorScore(1);
+                }
+
+                break;
+            case GameState.XrayPositioning05:
+                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+                {
+                    ScoreManager.Instance.IncreaseHelpScore(1);
+                    break;
+                }
+
+                if (actionItem.name != "Frontplate")
+                {
+                    ScoreManager.Instance.IncreaseErrorScore(1);
+                }
+
+                break;
+            case GameState.PlaceMarker06:
+                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+                {
+                    ScoreManager.Instance.IncreaseHelpScore(1);
+                    break;
+                }
+
+                if (actionItem.name != "xlaceMarker06")
+                {
+                    ScoreManager.Instance.IncreaseErrorScore(1);
+                }
+
+                break;
+            case GameState.InstructPatient07:
+                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+                {
+                    ScoreManager.Instance.IncreaseHelpScore(1);
+                    break;
+                }
+
+                if (actionItem.name != "instructPatient07")
+                {
+                    ScoreManager.Instance.IncreaseErrorScore(1);
+                }
+
+                break;
+            case GameState.LeaveRoom08:
+                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+                {
+                    ScoreManager.Instance.IncreaseHelpScore(1);
+                    break;
+                }
+
+                if (actionItem.name != "leaveRoom08")
+                {
+                    ScoreManager.Instance.IncreaseErrorScore(1);
+                }
+
+                break;
+            case GameState.StartXray09:
+                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+                {
+                    ScoreManager.Instance.IncreaseHelpScore(1);
+                    break;
+                }
+
+                if (actionItem.name != "startXray09")
+                {
+                    ScoreManager.Instance.IncreaseErrorScore(1);
+                }
+
+                break;
+            case GameState.CheckPicture10:
+                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+                {
+                    ScoreManager.Instance.IncreaseHelpScore(1);
+                    break;
+                }
+
+                if (actionItem.name != "checkPicture10")
+                {
+                    ScoreManager.Instance.IncreaseErrorScore(1);
+                }
+
                 break;
         }
     }
@@ -152,6 +358,14 @@ public class ActionManager : MonoBehaviour
     {
         currentState = newState;
     }
+
+    // // This function is called when the GameObject is clicked
+    // public void OnPointerClick(PointerEventData eventData)
+    // {
+    //     // Toggle color between original and click color
+    //     if(panelImage.color == originalColor)
+    //     panelImage.color = clickColor;
+    //     else
+    //     panelImage.color = originalColor;
+    // }
 }
-
-
