@@ -23,7 +23,7 @@ public class HelpBackToMain : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.H))
+        if (Input.GetKeyDown(KeyCode.I))
         {
             SceneManager.LoadScene(previousSceneName);
 

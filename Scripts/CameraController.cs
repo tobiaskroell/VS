@@ -56,15 +56,15 @@ public class CameraController : MonoBehaviour
             transform.localRotation = Quaternion.Euler(rotationX, transform.localRotation.eulerAngles.y, 0f);
 
             // Get keyboard movement input
-            float horizontal = Input.GetAxis("Horizontal") * moveSpeed * Time.deltaTime;
-            float vertical = Input.GetAxis("Vertical") * moveSpeed * Time.deltaTime;
+            // float horizontal = Input.GetAxis("Horizontal") * moveSpeed * Time.deltaTime;
+            // float vertical = Input.GetAxis("Vertical") * moveSpeed * Time.deltaTime;
 
             // Move the camera in the specified direction
-            transform.Translate(new Vector3(horizontal, 0f, vertical));
+            // transform.Translate(new Vector3(horizontal, 0f, vertical));
 
             // Move the camera up and down using the scroll wheel
-            float scroll = Input.GetAxis("Mouse ScrollWheel") * moveSpeed * Time.deltaTime;
-            transform.Translate(Vector3.up * scroll, Space.Self);
+            // float scroll = Input.GetAxis("Mouse ScrollWheel") * moveSpeed * Time.deltaTime;
+            // transform.Translate(Vector3.up * scroll, Space.Self);
         }
     }
 }

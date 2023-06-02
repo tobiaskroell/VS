@@ -21,7 +21,7 @@ public class LoadHelp : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.H))
+        if (Input.GetKeyDown(KeyCode.I))
         {
             // Get the position of the camera
             cameraPosition = myCamera.transform.position;

@@ -19,8 +19,10 @@ public class ScoreManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
-        else
+        else if (Instance != this)
         {
+            // Here, we destroy the new ScoreManager instead of the original one
+            Debug.Log("Duplicate instance of ScoreManager detected, destroying it.");
             Destroy(gameObject);
             return;
         }
@@ -32,16 +34,6 @@ public class ScoreManager : MonoBehaviour
         Debug.Log("ScoreManager Start() called");
         UpdateScoreText();
     }
-
-    // Update is called once per frame
-    // void Update()
-    // {
-    //     // Example: Increase score when the player presses a key
-    //     if (Input.GetKeyDown(KeyCode.Space))
-    //     {
-    //         IncreaseErrorScore(10); // Increase the score by 10 points
-    //     }
-    // }
 
     public void IncreaseErrorScore(int points)
     {

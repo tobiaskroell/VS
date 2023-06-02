@@ -9,8 +9,9 @@ public class SceneChanger : MonoBehaviour
 
     private void OnMouseDown()
     {
-        SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+        SceneManager.LoadScene(sceneName); // Load the specified scene
     }
+
 }
 
 
