@@ -7,13 +7,16 @@ public class Apron : MonoBehaviour
     // These fields can be set in the Unity Editor.
     public GameObject objectToActivate;
     public GameObject objectToDeactivate;
+    private ActionManager actionManager;
 
-    // This function is called when the mouse is clicked over the Collider
-    // of the GameObject this script is attached to.
     private void OnMouseDown()
     {
-        // Activate and deactivate the specified objects.
-        objectToActivate.SetActive(true);
-        objectToDeactivate.SetActive(false);
+        actionManager = FindObjectOfType<ActionManager>();
+        if(actionManager.CurrentState == ActionManager.GameState.RadiationProtection04)
+        {
+            // Activate and deactivate the specified objects.
+            objectToActivate.SetActive(true);
+            objectToDeactivate.SetActive(false);
+        }
     }
 }

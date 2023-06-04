@@ -9,21 +9,14 @@ using UnityEngine.EventSystems;
 public class ActionManager : MonoBehaviour, IPointerClickHandler
 {
 
-    // public GameObject pregnancyJewelry01;
-    // public GameObject explainProcedure02;
-    // public GameObject patientPositioning03;
-    // public GameObject radiationProtection04;
-    // public GameObject xrayPositioning05;
-    // public GameObject placeMarker06;
-    // public GameObject instructPatient07;
-    // public GameObject leaveRoom08;
-    // public GameObject startXray09;
-    // public GameObject checkPicture10;
-
-    public GameObject actionItem; // Can be helpIcon or actionItem from list
-    public GameState currentState;     // The current game state
-
-    // public static ActionManager Instance { get; private set; }
+    public GameObject actionItem; // actionItem from list
+    public GameObject correctPanel;
+    public GameObject errorPanel;
+    public GameObject hintPanel;
+    public TextMeshProUGUI hintMessage;
+    public TextMeshProUGUI actionItemText;
+    public static GameState currentState;  // Current game state
+    public static ActionManager Instance { get; private set; }
 
     // Define enum for game states
     public enum GameState
@@ -38,38 +31,23 @@ public class ActionManager : MonoBehaviour, IPointerClickHandler
         InstructPatient07,
         LeaveRoom08,
         StartXray09,
-        CheckPicture10
+        CheckPicture10,
+        End
     }
 
-    // private void Awake()
-    // {
-    //    if (Instance == null)
-    //     {
-    //         Instance = this;
-    //         DontDestroyOnLoad(gameObject);
 
-    //         // If this gameObject has a parent, we should detach it to ensure it is a root gameObject.
-    //         if (transform.parent != null)
-    //         {
-    //             transform.parent = null;
-    //         }
-    //     }
-    //     else if (Instance != this)
-    //     {
-    //         Debug.Log("Duplicate instance of ActionManager detected, destroying it.");
-    //         Destroy(gameObject);
-    //         return;
-    //     }
-    // }
 
     private void Start()
     {
-        currentState = GameState.PregnancyJewelry01;
+        if(PlayerPrefs.GetInt("activateActionmenu") == 1)
+        {
+            currentState = GameState.PregnancyJewelry01;
+        }
     }
 
     private void OnMouseDown()
     {
-        Debug.Log("Object clicked!");
+        Debug.Log("Object clicked: " + actionItem.ToString());
         switch (currentState)
         {
             case GameState.PreActionMenu00:
@@ -77,135 +55,236 @@ public class ActionManager : MonoBehaviour, IPointerClickHandler
                 break;
 
             case GameState.PregnancyJewelry01:
-                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+                Debug.Log("GameState.PregnancyJewelry01 entered - Current State: " + currentState);
+                if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
+                    StartCoroutine(ShowHint(hintMessage, "Prüfe zuerst auf Kontraindikation."));
                     break;
                 }
 
                 else if (actionItem.name != "pregnancyJewelry01")
                 {
                     ScoreManager.Instance.IncreaseErrorScore(1);
+                    StartCoroutine(ShowError(errorPanel));
+                    break;
                 }
 
-                break;
+                else
+                {
+                    StrikeThroughText();
+                    currentState = GameState.ExplainProcedure02;
+                    break;
+                }
+
+
             case GameState.ExplainProcedure02:
-                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+                Debug.Log("GameState.ExplainProcedure02 entered - Current State: " + currentState);
+                if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
+                    StartCoroutine(ShowHint(hintMessage, "Der Patient fühlt sich wohler, wenn er weiß was als nächstes passiert."));
                     break;
                 }
 
-                if (actionItem.name != "explainProcedure02")
+                else if (actionItem.name != "explainProcedure02")
                 {
                     ScoreManager.Instance.IncreaseErrorScore(1);
+                    StartCoroutine(ShowError(errorPanel));
+                    break;
                 }
 
-                break;
+                else
+                {
+                    StrikeThroughText();
+                    currentState = GameState.PatientPositioning03;
+                    break;
+                }                     
+
             case GameState.PatientPositioning03:
-                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+            Debug.Log("GameState.PatientPositioning03 entered - Current State: " + currentState);
+            Debug.Log("PlayerPrefs.GetInt(CurrentMovementMark): " + PlayerPrefs.GetInt("CurrentMovementMark"));
+                if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
+                    StartCoroutine(ShowHint(hintMessage, "Bevor es weitergeht, muss sich der Patient in der richtigen Position befinden. Um den Patienten zu bewegen, musst du vor dem Patienten stehen."));
                     break;
                 }
 
-                if (actionItem.name != "patientPositioning03")
+                else if (actionItem.name != "patientPositioning03" || PlayerPrefs.GetInt("CurrentMovementMark") != 1)
                 {
                     ScoreManager.Instance.IncreaseErrorScore(1);
+                    StartCoroutine(ShowError(errorPanel));
+                    break;
+                }
+                
+                else
+                {
+                    StrikeThroughText();
+                    currentState = GameState.RadiationProtection04;
+                    break;
                 }
 
-                break;
             case GameState.RadiationProtection04:
-                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+            Debug.Log("GameState.RadiationProtection04 entered - Current State: " + currentState);
+                if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
+                    StartCoroutine(ShowHint(hintMessage, "Bevor es weitergeht, benötigt der Patient einen Strahlenschutz."));
                     break;
                 }
 
-                if (actionItem.name != "apronWallBlue")
+                else if (actionItem.name != "apronWallBlue")
                 {
                     ScoreManager.Instance.IncreaseErrorScore(1);
+                    StartCoroutine(ShowError(errorPanel));
+                    break;
                 }
 
-                break;
+                else
+                {
+                    StrikeThroughText();
+                    currentState = GameState.XrayPositioning05;
+                    break;
+                }
+                
             case GameState.XrayPositioning05:
-                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+            Debug.Log("GameState.XrayPositioning05 entered - Current State: " + currentState);
+                if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
+                    StartCoroutine(ShowHint(hintMessage, "Bevor es weitergeht, muss das Röntgengerät richtig positioniert werden."));
                     break;
                 }
 
-                if (actionItem.name != "Frontplate")
+                else if (actionItem.name != "Frontplate")
                 {
                     ScoreManager.Instance.IncreaseErrorScore(1);
+                    StartCoroutine(ShowError(errorPanel));
+                    break;
                 }
 
-                break;
+                else
+                {
+                    StrikeThroughText();
+                    currentState = GameState.PlaceMarker06;
+                    break;
+                }
+
             case GameState.PlaceMarker06:
-                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+            Debug.Log("GameState.PlaceMarker06 entered - Current State: " + currentState);
+                if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
+                    StartCoroutine(ShowHint(hintMessage, "Es muss ersichtlich sein, ob die Aufnahme von der linken oder rechten Körperhälfte gemacht wird."));
                     break;
                 }
 
-                if (actionItem.name != "xlaceMarker06")
+                else if (actionItem.name != "placeMarker06")
                 {
                     ScoreManager.Instance.IncreaseErrorScore(1);
+                    StartCoroutine(ShowError(errorPanel));
+                    break;
                 }
 
-                break;
+                else
+                {
+                    StrikeThroughText();
+                    currentState = GameState.InstructPatient07;
+                    break;
+                }
+
             case GameState.InstructPatient07:
-                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+            Debug.Log("GameState.InstructPatient07 entered - Current State: " + currentState);
+                if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
+                    StartCoroutine(ShowHint(hintMessage, "Der Patient muss wissen, dass er sich bei der Aufnahme nicht bewegen darf."));
                     break;
                 }
 
-                if (actionItem.name != "instructPatient07")
+                else if (actionItem.name != "instructPatient07")
                 {
                     ScoreManager.Instance.IncreaseErrorScore(1);
+                    StartCoroutine(ShowError(errorPanel));
+                    break;
                 }
 
-                break;
+                else
+                {
+                    StrikeThroughText();
+                    currentState = GameState.LeaveRoom08;
+                    break;
+                }
+
             case GameState.LeaveRoom08:
-                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+            Debug.Log("GameState.LeaveRoom08 entered - Current State: " + currentState);
+                if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
+                    StartCoroutine(ShowHint(hintMessage, "Bevor die Aufnahme gestartet wird, musst du den Raum verlassen."));
                     break;
                 }
 
-                if (actionItem.name != "leaveRoom08")
+                else if (PlayerPrefs.GetInt("CurrentMovementMark") != 3)
                 {
                     ScoreManager.Instance.IncreaseErrorScore(1);
+                    StartCoroutine(ShowError(errorPanel));
+                    break;
                 }
 
-                break;
+                else
+                {
+                    StrikeThroughText();
+                    currentState = GameState.StartXray09;
+                    break;
+                }
+
             case GameState.StartXray09:
-                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+            Debug.Log("GameState.StartXray09 entered - Current State: " + currentState);
+                if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
+                    StartCoroutine(ShowHint(hintMessage, "Starte die Röntgenaufnahme."));
                     break;
                 }
 
-                if (actionItem.name != "startXray09")
+                else if (actionItem.name != "startXray09")
                 {
                     ScoreManager.Instance.IncreaseErrorScore(1);
+                    StartCoroutine(ShowError(errorPanel));
+                    break;
+                }
+                
+                else
+                {
+                    StrikeThroughText();
+                    currentState = GameState.CheckPicture10;
+                    break;
                 }
 
-                break;
             case GameState.CheckPicture10:
-                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+            Debug.Log("GameState.CheckPicture10 entered - Current State: " + currentState);
+                if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
+                    StartCoroutine(ShowHint(hintMessage, "Prüfe, ob das Bild technisch korrekt aufgenommen wurde."));
                     break;
                 }
 
-                if (actionItem.name != "checkPicture10")
+                else if (actionItem.name != "checkPicture10")
                 {
                     ScoreManager.Instance.IncreaseErrorScore(1);
+                    StartCoroutine(ShowError(errorPanel));
+                    break;
                 }
 
-                break;
+                else
+                {
+                    StrikeThroughText();
+                    currentState = GameState.End;
+                    break;
+                }
         }
     }
     
@@ -213,7 +292,7 @@ public class ActionManager : MonoBehaviour, IPointerClickHandler
     // This function is called when the Panel is clicked
     public void OnPointerClick(PointerEventData eventData)
     {
-        Debug.Log("Object clicked!");
+        Debug.Log("Object clicked: " + actionItem.ToString());
         switch (currentState)
         {
             case GameState.PreActionMenu00:
@@ -221,136 +300,283 @@ public class ActionManager : MonoBehaviour, IPointerClickHandler
                 break;
 
             case GameState.PregnancyJewelry01:
-                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+                Debug.Log("GameState.PregnancyJewelry01 entered - Current State: " + currentState);
+                if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
+                    StartCoroutine(ShowHint(hintMessage, "Prüfe zuerst auf Kontraindikation."));
                     break;
                 }
 
                 else if (actionItem.name != "pregnancyJewelry01")
                 {
                     ScoreManager.Instance.IncreaseErrorScore(1);
+                    StartCoroutine(ShowError(errorPanel));
+                    break;
                 }
 
-                break;
+                else
+                {
+                    StrikeThroughText();
+                    currentState = GameState.ExplainProcedure02;
+                    break;
+                }
+
+
             case GameState.ExplainProcedure02:
-                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+                Debug.Log("GameState.ExplainProcedure02 entered - Current State: " + currentState);
+                if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
+                    StartCoroutine(ShowHint(hintMessage, "Der Patient fühlt sich wohler, wenn er weiß was als nächstes passiert."));
                     break;
                 }
 
-                if (actionItem.name != "explainProcedure02")
+                else if (actionItem.name != "explainProcedure02")
                 {
                     ScoreManager.Instance.IncreaseErrorScore(1);
+                    StartCoroutine(ShowError(errorPanel));
+                    break;
                 }
 
-                break;
+                else
+                {
+                    StrikeThroughText();
+                    currentState = GameState.PatientPositioning03;
+                    break;
+                }                     
+
             case GameState.PatientPositioning03:
-                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+            Debug.Log("GameState.PatientPositioning03 entered - Current State: " + currentState);
+            Debug.Log("PlayerPrefs.GetInt(CurrentMovementMark): " + PlayerPrefs.GetInt("CurrentMovementMark"));
+                if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
+                    StartCoroutine(ShowHint(hintMessage, "Bevor es weitergeht, muss sich der Patient in der richtigen Position befinden. Um den Patienten zu bewegen, musst du vor dem Patienten stehen."));
                     break;
                 }
 
-                if (actionItem.name != "patientPositioning03")
+                else if (actionItem.name != "patientPositioning03" || PlayerPrefs.GetInt("CurrentMovementMark") != 1)
                 {
                     ScoreManager.Instance.IncreaseErrorScore(1);
+                    StartCoroutine(ShowError(errorPanel));
+                    break;
+                }
+                
+                else
+                {
+                    StrikeThroughText();
+                    currentState = GameState.RadiationProtection04;
+                    break;
                 }
 
-                break;
             case GameState.RadiationProtection04:
-                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+            Debug.Log("GameState.RadiationProtection04 entered - Current State: " + currentState);
+                if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
+                    StartCoroutine(ShowHint(hintMessage, "Bevor es weitergeht, benötigt der Patient einen Strahlenschutz."));
                     break;
                 }
 
-                if (actionItem.name != "apronWallBlue")
+                else if (actionItem.name != "apronWallBlue")
                 {
                     ScoreManager.Instance.IncreaseErrorScore(1);
+                    StartCoroutine(ShowError(errorPanel));
+                    break;
                 }
 
-                break;
+                else
+                {
+                    StrikeThroughText();
+                    currentState = GameState.XrayPositioning05;
+                    break;
+                }
+                
             case GameState.XrayPositioning05:
-                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+            Debug.Log("GameState.XrayPositioning05 entered - Current State: " + currentState);
+                if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
+                    StartCoroutine(ShowHint(hintMessage, "Bevor es weitergeht, muss das Röntgengerät richtig positioniert werden."));
                     break;
                 }
 
-                if (actionItem.name != "Frontplate")
+                else if (actionItem.name != "Frontplate")
                 {
                     ScoreManager.Instance.IncreaseErrorScore(1);
+                    StartCoroutine(ShowError(errorPanel));
+                    break;
                 }
 
-                break;
+                else
+                {
+                    StrikeThroughText();
+                    currentState = GameState.PlaceMarker06;
+                    break;
+                }
+
             case GameState.PlaceMarker06:
-                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+            Debug.Log("GameState.PlaceMarker06 entered - Current State: " + currentState);
+                if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
+                    StartCoroutine(ShowHint(hintMessage, "Es muss ersichtlich sein, ob die Aufnahme von der linken oder rechten Körperhälfte gemacht wird."));
                     break;
                 }
 
-                if (actionItem.name != "xlaceMarker06")
+                else if (actionItem.name != "placeMarker06")
                 {
                     ScoreManager.Instance.IncreaseErrorScore(1);
+                    StartCoroutine(ShowError(errorPanel));
+                    break;
                 }
 
-                break;
+                else
+                {
+                    StrikeThroughText();
+                    currentState = GameState.InstructPatient07;
+                    break;
+                }
+
             case GameState.InstructPatient07:
-                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+            Debug.Log("GameState.InstructPatient07 entered - Current State: " + currentState);
+                if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
+                    StartCoroutine(ShowHint(hintMessage, "Der Patient muss wissen, dass er sich bei der Aufnahme nicht bewegen darf."));
                     break;
                 }
 
-                if (actionItem.name != "instructPatient07")
+                else if (actionItem.name != "instructPatient07")
                 {
                     ScoreManager.Instance.IncreaseErrorScore(1);
+                    StartCoroutine(ShowError(errorPanel));
+                    break;
                 }
 
-                break;
+                else
+                {
+                    StrikeThroughText();
+                    currentState = GameState.LeaveRoom08;
+                    break;
+                }
+
             case GameState.LeaveRoom08:
-                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+            Debug.Log("GameState.LeaveRoom08 entered - Current State: " + currentState);
+                if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
+                    StartCoroutine(ShowHint(hintMessage, "Bevor die Aufnahme gestartet wird, musst du den Raum verlassen."));
                     break;
                 }
 
-                if (actionItem.name != "leaveRoom08")
+                else if (PlayerPrefs.GetInt("CurrentMovementMark") != 3)
                 {
                     ScoreManager.Instance.IncreaseErrorScore(1);
+                    StartCoroutine(ShowError(errorPanel));
+                    break;
                 }
 
-                break;
+                else
+                {
+                    StrikeThroughText();
+                    currentState = GameState.StartXray09;
+                    break;
+                }
+
             case GameState.StartXray09:
-                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+            Debug.Log("GameState.StartXray09 entered - Current State: " + currentState);
+                if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
+                    StartCoroutine(ShowHint(hintMessage, "Starte die Röntgenaufnahme."));
                     break;
                 }
 
-                if (actionItem.name != "startXray09")
+                else if (actionItem.name != "startXray09")
                 {
                     ScoreManager.Instance.IncreaseErrorScore(1);
+                    StartCoroutine(ShowError(errorPanel));
+                    break;
+                }
+                
+                else
+                {
+                    StrikeThroughText();
+                    currentState = GameState.CheckPicture10;
+                    break;
                 }
 
-                break;
             case GameState.CheckPicture10:
-                if (actionItem.name == "helpIcon" || Input.GetKeyDown(KeyCode.H) && gameObject.name == "helpIcon")
+            Debug.Log("GameState.CheckPicture10 entered - Current State: " + currentState);
+                if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
+                    StartCoroutine(ShowHint(hintMessage, "Prüfe, ob das Bild technisch korrekt aufgenommen wurde."));
                     break;
                 }
 
-                if (actionItem.name != "checkPicture10")
+                else if (actionItem.name != "checkPicture10")
                 {
                     ScoreManager.Instance.IncreaseErrorScore(1);
+                    StartCoroutine(ShowError(errorPanel));
+                    break;
                 }
 
+                else
+                {
+                    StrikeThroughText();
+                    currentState = GameState.End;
+                    break;
+                }
+
+            case GameState.End:
+            Debug.Log("GameState.End entered - Current State: " + currentState);
+            PlayerPrefs.SetInt("GameFinished", 1);
+                if (actionItem.name == "showHint")
+                {
+                    ScoreManager.Instance.IncreaseHelpScore(1);
+                    StartCoroutine(ShowHint(hintMessage, "Du hast das Ende des Demonstrators erreicht. Vielen Dank für's Spielen!"));
+                    break;
+                }
                 break;
         }
+    }
+
+    IEnumerator ShowError(GameObject panelName)
+    {      
+        // show panel
+        panelName.SetActive(true);
+
+        // wait for 5 seconds
+        yield return new WaitForSeconds(5f);
+
+        // hide panel
+        panelName.SetActive(false);
+    }
+
+    IEnumerator ShowHint(TextMeshProUGUI hintMessage, string hintText)
+    {
+        // Change text
+        hintMessage.text = hintText;
+        
+        // show panel
+        hintPanel.SetActive(true);
+
+        // wait for 5 seconds
+        yield return new WaitForSeconds(5f);
+
+        // hide panel
+        hintPanel.SetActive(false);
+    }
+
+    private void StrikeThroughText()
+    {
+        currentState = GameState.ExplainProcedure02;
+        string originalText = actionItemText.text;
+        string strikethroughText = "<s>" + originalText + "</s>"; // Add the strikethrough tags
+        actionItemText.text = strikethroughText; // Update the text in the TextMeshPro component
     }
 
     // Function to change the game state
@@ -359,13 +585,8 @@ public class ActionManager : MonoBehaviour, IPointerClickHandler
         currentState = newState;
     }
 
-    // // This function is called when the GameObject is clicked
-    // public void OnPointerClick(PointerEventData eventData)
-    // {
-    //     // Toggle color between original and click color
-    //     if(panelImage.color == originalColor)
-    //     panelImage.color = clickColor;
-    //     else
-    //     panelImage.color = originalColor;
-    // }
+    public GameState CurrentState
+    {
+        get { return currentState; }
+    }
 }
