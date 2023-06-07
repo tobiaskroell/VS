@@ -3,8 +3,14 @@ using TMPro;
 
 public class ModifyScore : MonoBehaviour
 {
-    public TextMeshProUGUI errorScore;
-    public TextMeshProUGUI helpScore;
+    private TextMeshProUGUI errorScore;
+    private TextMeshProUGUI helpScore;
+
+    private void Start()
+    {
+        errorScore = GameObject.Find("fehlerCount").GetComponent<TextMeshProUGUI>();
+        helpScore = GameObject.Find("hilfenCount").GetComponent<TextMeshProUGUI>();
+    }
 
     public void incrementErrorScore()
     {
@@ -20,6 +26,4 @@ public class ModifyScore : MonoBehaviour
         int currentHelpScore = ScoreManager.Instance.helpScore;
         helpScore.text = currentHelpScore.ToString();
     }
-
-
 }
