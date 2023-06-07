@@ -38,7 +38,7 @@ public class ScoreManager : MonoBehaviour
     public void IncreaseErrorScore(int points)
     {
         errorScore += points;
-        Debug.Log("errorScore increased by " + points + ". Current score: " + errorScore);
+        Debug.Log("errorScore increased by " + points + ". Error score: " + errorScore);
 
         UpdateScoreText(); // Update the UI text after the score changes
     }
@@ -46,7 +46,7 @@ public class ScoreManager : MonoBehaviour
     public void IncreaseHelpScore(int points)
     {
         helpScore += points;
-        Debug.Log("helpScore increased by " + points + ". Current score: " + helpScore);
+        Debug.Log("helpScore increased by " + points + ". Help score: " + helpScore);
 
         UpdateScoreText(); // Update the UI text after the score changes
     }
@@ -56,6 +56,7 @@ public class ScoreManager : MonoBehaviour
         if (fehlerCount != null)
         {
             fehlerCount.text = errorScore.ToString();
+            hilfenCount.text = helpScore.ToString();
         }
     }
 }
