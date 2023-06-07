@@ -13,7 +13,7 @@ public class FrontplateClick : MonoBehaviour
     {
         gameManager = FindObjectOfType<GameManager>();
         
-        if(gameManager.CurrentState == GameManager.GameState.XrayPositioning05 && PlayerPrefs.GetInt("CurrentMovementMark") == 1)
+        if(gameManager.CurrentState == GameManager.GameState.XrayPositioning07 && PlayerPrefs.GetInt("CurrentMovementMark") == 1)
         {
             Debug.Log("Frontplate clicked");
             StartCoroutine(ShowMovementInstructions());
