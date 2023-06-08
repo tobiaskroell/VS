@@ -41,7 +41,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
     {   
         Debug.Log("GameState: " + currentState);
         prompt.SetActive(true);
-        promptMessage.text = "Begib dich an den PC, um die Voreinstellungen für die Röntgenaufnahme vorzunehmen.";
+        promptMessage.text = "Begib dich an den PC, um Voreinstellungen für die Röntgenaufnahme vorzunehmen.";
         
         if (PlayerPrefs.GetInt("FirstStart") == 0)
         {
