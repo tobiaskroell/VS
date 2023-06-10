@@ -11,17 +11,25 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
     public GameObject actionItem; // actionItem from list
     public GameObject correctPanel;
     public GameObject errorPanel;
+    public TextMeshProUGUI errorMessage;
     public GameObject hintPanel;
-    public GameObject xrayMovementInstruction;
     public TextMeshProUGUI hintMessage;
+    public GameObject xrayMovementInstruction;
+    public GameObject windowsizeInstructionHeight;
+    public GameObject windowsizeInstructionWidth;
     public GameObject prompt;
     public TextMeshProUGUI promptMessage;
-    // public TextMeshProUGUI actionItemText;
-    public static GameState currentState;  // Current game state
-    public static GameManager Instance { get; private set; }
     private MoveXrayHead moveXrayHead;
     private HeightHandler heightHandler;
     private WidthHandler widthHandler;
+    public static GameState currentState;  // Current game state
+    public static GameManager Instance { get; private set; }
+    public Button submitBtn;
+    bool windowHeightCorrect = false;
+    bool windowWidthCorrect = false;
+    bool xrayHeightCorrect = false;
+    bool xrayPositionCorrect = false;
+
 
     // Define enum for game states
     public enum GameState
@@ -32,10 +40,13 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
         Choice04,
         PostChoice05,
         RadiationProtection06,
-        XrayPositioning07,
-        PlaceMarker08,
-        LeaveRoom09,
-        StartXray10,
+        AdjustWindowHeight07,
+        AdjustWindowWidth08,
+        AdjustXrayHeight09,
+        AdjustXrayPosition10,
+        PlaceMarker11,
+        LeaveRoom12,
+        StartXray13,
         End
     }
 
@@ -83,6 +94,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
 
                 else if (actionItem.name != "PC_Sphere")
                 {
+                    Debug.Log("GameState.Choice01: actionItem.name != PC_Sphere");
                     ScoreManager.Instance.IncreaseErrorScore(1);
                     StartCoroutine(ShowError(errorPanel));
                     break;
@@ -157,14 +169,14 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 }
 
             case GameState.RadiationProtection06:
-                Debug.Log("GameState.RadiationProtection06 CAAAAALEEEDD - Current State: " + currentState);
+                Debug.Log("GameState.RadiationProtection06 called - Current State: " + currentState);
                 prompt.SetActive(true);
                 promptMessage.text = "Als nächstes benötigt der Patient einen Strahlenschutz.";
                 
                 if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
-                    StartCoroutine(ShowHint(hintMessage, "Als nächstes benötigt der Patient einen Strahlenschutz."));
+                    StartCoroutine(ShowHint(hintMessage, "Als nächstes benötigt der Patient einen Strahlenschutz. Lege ihm dazu die Bleischürze an, die an der Wand hängt."));
                     break;
                 }
 
@@ -173,6 +185,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                     ScoreManager.Instance.IncreaseErrorScore(1);
                     if (actionItem.activeInHierarchy)  // Check if the GameObject is active
                     {
+                        Debug.Log("GameState.RadiationProtection06: actionItem.name != apronWallBlue -> actionItem.activeInHierarchy");
                         StartCoroutine(ShowError(errorPanel));
                     }
                     break;
@@ -180,89 +193,251 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
 
                 else
                 {
-                    currentState = GameState.XrayPositioning07;
-                    PlayerPrefs.SetInt("ShowMovementInstructions", 0);
-                    Debug.Log("GameState.XrayPositioning07 entered - Current State: " + currentState);
+                    currentState = GameState.AdjustWindowWidth08;
+                    PlayerPrefs.SetInt("AdjustWindowWidth", 0);
+                    PlayerPrefs.SetInt("AdjustWindowHeight", 0);
+                    PlayerPrefs.SetInt("AdjustXrayHeight", 0);
+                    PlayerPrefs.SetInt("AdjustXrayPosition", 0);
+                    Debug.Log("GameState.AdjustWindowWidth08 entered - Current State: " + currentState);
                     prompt.SetActive(true);
-                    promptMessage.text = "Positioniere das Röntgengerät. Höhe 115 cm, Format 18x43.";
+                    promptMessage.text = "Positioniere das Röntgengerät. Höhe 115 cm, Aufnahmeformat 18x43.";
                     break;
                 }
-                
-            case GameState.XrayPositioning07:
-                bool xrayPositioningCorrect = false;
-                
 
+            case GameState.AdjustWindowHeight07:
+                windowHeightCorrect = false;
+
+                // Show hint if user clicks on the hint button                    
                 if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
-                    StartCoroutine(ShowHint(hintMessage, "Bevor es weitergeht, muss das Röntgengerät richtig positioniert werden. Höhe 115 cm, Format 18x43."));
+                    StartCoroutine(ShowHint(hintMessage, "Stelle die Höhe des Aufnahmefensters auf 18 ein."));
                     break;
                 }
 
-                else if (actionItem.name != "Frontplate")
+                // Show error if user doesn't click on the left knob
+                if (actionItem.name != "BtnLeftGreen")
                 {
-                    Debug.Log("IF1");
+                    Debug.Log("GameState.AdjustWindowHeight07: actionItem.name != BtnLeftGreen");
+                    Debug.Log("ActionItem: " + actionItem.name);
                     ScoreManager.Instance.IncreaseErrorScore(1);
                     StartCoroutine(ShowError(errorPanel));
                     break;
                 }
 
-                else if ((PlayerPrefs.GetInt("CurrentMovementMark") == 1) && currentState == GameState.XrayPositioning07)
+                // Check if instruction for adjusting height has been shown
+                if (PlayerPrefs.GetInt("AdjustWindowHeight") == 0)
                 {
-                    if (moveXrayHead.Height == 115 && heightHandler.normalizedHeight == 18 && widthHandler.normalizedWidth == 43)
-                        xrayPositioningCorrect = true;
+                    Debug.Log("AdjustWindowHeight07: PlayerPrefs.GetInt(AdjustWindowHeight) == 0");
 
-                    if (xrayPositioningCorrect)
-                    {
-                        currentState = GameState.PlaceMarker08;
-                        moveXrayHead.heightPanel.SetActive(false);
-                        Debug.Log("GameState.PlaceMarker08 entered - Current State: " + currentState);
-                        break;
-                    }
-
-                    Debug.Log("Entered Routine for checking positioning: " + currentState);
-                    moveXrayHead.heightPanel.SetActive(true);
-                    widthHandler.widthPanel.SetActive(true);
-
-                    if (PlayerPrefs.GetInt("ShowMovementInstructions") != 0)
-                    {
-                        Debug.Log("IF2");
-
-                        ScoreManager.Instance.IncreaseErrorScore(1);
-                        StartCoroutine(ShowError(errorPanel));
-                        break;
-                    }
-
-                    else if (PlayerPrefs.GetInt("ShowMovementInstructions") == 0)
-                    {
-                        StartCoroutine(ShowMovementInstructions());
-                        PlayerPrefs.SetInt("ShowMovementInstructions", 1);
-                    }
+                    StartCoroutine(ShowWindowsizeInstructionHeight());
+                    PlayerPrefs.SetInt("AdjustWindowHeight", 1);
+                    break;
                 }
 
+                if (PlayerPrefs.GetInt("AdjustWindowHeight") != 0)
+                {
+                    Debug.Log("AdjustWindowHeight07: PlayerPrefs.GetInt(AdjustWindowHeight) != 0");
+
+                    ScoreManager.Instance.IncreaseErrorScore(1);
+                    StartCoroutine(ShowError(errorPanel));
+                    break;
+                }
+
+                // Check if height is correct and move to next state 
+                submitBtn.onClick.AddListener(OnClickAction);
+                moveXrayHead.heightPanel.SetActive(true);
+                submitBtn.gameObject.SetActive(true);
+
+                break;
+
+
+            case GameState.AdjustWindowWidth08:
+
+                // Show hint if user clicks on the hint button                    
+                if (actionItem.name == "showHint")
+                {
+                    ScoreManager.Instance.IncreaseHelpScore(1);
+                    StartCoroutine(ShowHint(hintMessage, "Stelle die Höhe des Aufnahmefensters auf 18 ein."));
+                    break;
+                }
+
+                // Show error if user doesn't click on the left knob
+                if (actionItem.name != "BtnRightGreen")
+                {
+                    Debug.Log("GameState.AdjustWindowWidth08: actionItem.name != BtnLeftGreen");
+                    Debug.Log("ActionItem: " + actionItem.name);
+                    ScoreManager.Instance.IncreaseErrorScore(1);
+                    StartCoroutine(ShowError(errorPanel));
+                    break;
+                }
+
+                // Check if instruction for adjusting height has been shown
+                if (PlayerPrefs.GetInt("AdjustWindowWidth") == 0)
+                {
+                    Debug.Log("AdjustWindowWidth08: PlayerPrefs.GetInt(AdjustWindowWidth) == 0");
+
+                    StartCoroutine(ShowWindowsizeInstructionWidth());
+                    PlayerPrefs.SetInt("AdjustWindowWidth", 1);
+                    break;
+                }
+
+                if (PlayerPrefs.GetInt("AdjustWindowWidth") != 0)
+                {
+                    Debug.Log("AdjustWindowWidth08: PlayerPrefs.GetInt(AdjustWindowWidth) != 0");
+
+                    ScoreManager.Instance.IncreaseErrorScore(1);
+                    StartCoroutine(ShowError(errorPanel));
+                    break;
+                }
+
+                // Check if height is correct and move to next state 
+                submitBtn.onClick.AddListener(OnClickAction);
+                moveXrayHead.heightPanel.SetActive(true);
+                submitBtn.gameObject.SetActive(true);
+
+                
+                
+                // else if (PlayerPrefs.GetInt("CurrentMovementMark") != 0)
+                // {
+                //     Debug.Log("AdjustWindowWidth08: PlayerPrefs.GetInt(CurrentMovementMark) != 0");
+                //     ScoreManager.Instance.IncreaseErrorScore(1);
+                //     StartCoroutine(ShowError(errorPanel));
+                //     prompt.SetActive(true);
+                //     promptMessage.text = "Um das Röntgengerät zu positionieren, musst du vor dem Gerät stehen.";
+                //     break;
+                // }
+
+                break;
+
+            
+
+            case GameState.AdjustXrayHeight09:
+                xrayHeightCorrect = false;
+                
+                if (actionItem.name == "showHint")
+                {
+                    ScoreManager.Instance.IncreaseHelpScore(1);
+                    StartCoroutine(ShowHint(hintMessage, "Um die Höhe auf 115 cm einzustellen, musst du den linken Drehknopf anwählen."));
+                    break;
+                }
+
+                else if (actionItem.name != "BtnLeftGreen")
+                {
+                    Debug.Log("GameState.AdjustWindowWidth08: actionItem.name != BtnLeftGreen || actionItem.name != BtnRightGreen");
+                    Debug.Log("ActionItem: " + actionItem.name);
+                    ScoreManager.Instance.IncreaseErrorScore(1);
+                    StartCoroutine(ShowError(errorPanel));
+                    break;
+                }
+
+                Debug.Log("Entered Routine for adjusting height: " + currentState);
+
+                // Move to next state if height is correct
+                submitBtn.onClick.AddListener(OnClickAction);
+                moveXrayHead.heightPanel.SetActive(true);
+                submitBtn.gameObject.SetActive(true);
+
+                if (PlayerPrefs.GetInt("AdjustHeight") != 0)
+                {
+                    Debug.Log("AdjustWindowWidth08: PlayerPrefs.GetInt(AdjustHeight) != 0");
+
+                    ScoreManager.Instance.IncreaseErrorScore(1);
+                    StartCoroutine(ShowError(errorPanel));
+                    break;
+                }
+
+                else if (PlayerPrefs.GetInt("AdjustHeight") == 0)
+                {
+                    Debug.Log("AdjustWindowWidth08: PlayerPrefs.GetInt(AdjustHeight) == 0");
+
+                    StartCoroutine(ShowWindowsizeInstructionHeight());
+                    PlayerPrefs.SetInt("AdjustHeight", 1);
+                    break;
+                }
+                
                 else if (PlayerPrefs.GetInt("CurrentMovementMark") != 0)
                 {
-                    Debug.Log("IF3");
+                    Debug.Log("AdjustWindowWidth08: PlayerPrefs.GetInt(CurrentMovementMark) != 0");
                     ScoreManager.Instance.IncreaseErrorScore(1);
                     StartCoroutine(ShowError(errorPanel));
                     prompt.SetActive(true);
-                    promptMessage.text = "Platziere den Links-Rechts-Marker.";
+                    promptMessage.text = "Um das Röntgengerät zu positionieren, musst du vor dem Gerät stehen.";
+                    break;
+                }
+
+                break;
+            
+            case GameState.AdjustXrayPosition10:
+                xrayPositionCorrect = false;
+                
+                if (actionItem.name == "showHint")
+                {
+                    ScoreManager.Instance.IncreaseHelpScore(1);
+                    StartCoroutine(ShowHint(hintMessage, "Um die Höhe auf 115 cm einzustellen, musst du den linken Drehknopf anwählen."));
+                    break;
+                }
+
+                else if (actionItem.name != "BtnLeftGreen")
+                {
+                    Debug.Log("GameState.AdjustWindowWidth08: actionItem.name != BtnLeftGreen || actionItem.name != BtnRightGreen");
+                    Debug.Log("ActionItem: " + actionItem.name);
+                    ScoreManager.Instance.IncreaseErrorScore(1);
+                    StartCoroutine(ShowError(errorPanel));
+                    break;
+                }
+
+                Debug.Log("Entered Routine for adjusting height: " + currentState);
+
+                // Move to next state if height is correct
+                submitBtn.onClick.AddListener(OnClickAction);
+                moveXrayHead.heightPanel.SetActive(true);
+                submitBtn.gameObject.SetActive(true);
+
+                if (moveXrayHead.Height == 115 && heightHandler.normalizedHeight == 18 && widthHandler.normalizedWidth == 43)
+
+                if (PlayerPrefs.GetInt("AdjustHeight") != 0)
+                {
+                    Debug.Log("AdjustWindowWidth08: PlayerPrefs.GetInt(AdjustHeight) != 0");
+
+                    ScoreManager.Instance.IncreaseErrorScore(1);
+                    StartCoroutine(ShowError(errorPanel));
+                    break;
+                }
+
+                else if (PlayerPrefs.GetInt("AdjustHeight") == 0)
+                {
+                    Debug.Log("AdjustWindowWidth08: PlayerPrefs.GetInt(AdjustHeight) == 0");
+
+                    StartCoroutine(ShowWindowsizeInstructionHeight());
+                    PlayerPrefs.SetInt("AdjustHeight", 1);
+                    break;
+                }
+                
+                else if (PlayerPrefs.GetInt("CurrentMovementMark") != 0)
+                {
+                    Debug.Log("AdjustWindowWidth08: PlayerPrefs.GetInt(CurrentMovementMark) != 0");
+                    ScoreManager.Instance.IncreaseErrorScore(1);
+                    StartCoroutine(ShowError(errorPanel));
+                    prompt.SetActive(true);
+                    promptMessage.text = "Um das Röntgengerät zu positionieren, musst du vor dem Gerät stehen.";
                     break;
                 }
 
                 break;
 
-            case GameState.PlaceMarker08:
+            case GameState.PlaceMarker11:
                 
                 if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
-                    StartCoroutine(ShowHint(hintMessage, "PlaceMarker08Text"));
+                    StartCoroutine(ShowHint(hintMessage, "PlaceMarker11Text"));
                     break;
                 }
 
-                else if (actionItem.name != "PlaceMarker08")
+                else if (actionItem.name != "PlaceMarker11")
                 {
+                    Debug.Log("GameState.PlaceMarker11: actionItem.name != PlaceMarker11");
                     ScoreManager.Instance.IncreaseErrorScore(1);
                     StartCoroutine(ShowError(errorPanel));
                     break;
@@ -270,24 +445,25 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
 
                 else
                 {
-                    currentState = GameState.LeaveRoom09;
-                    Debug.Log("GameState.LeaveRoom09 entered - Current State: " + currentState);
+                    currentState = GameState.LeaveRoom12;
+                    Debug.Log("GameState.LeaveRoom12 entered - Current State: " + currentState);
                     prompt.SetActive(true);
                     promptMessage.text = "Verlasse den Raum.";
                     break;
                 }
 
-            case GameState.LeaveRoom09:
+            case GameState.LeaveRoom12:
                 
                 if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
-                    StartCoroutine(ShowHint(hintMessage, "LeaveRoom09Text"));
+                    StartCoroutine(ShowHint(hintMessage, "LeaveRoom12Text"));
                     break;
                 }
 
-                else if (actionItem.name != "instructPatient07")
+                else if (actionItem.name != "LeaveRoom12")
                 {
+                    Debug.Log("GameState.LeaveRoom12: actionItem.name != LeaveRoom12");
                     ScoreManager.Instance.IncreaseErrorScore(1);
                     StartCoroutine(ShowError(errorPanel));
                     break;
@@ -295,24 +471,25 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
 
                 else
                 {
-                    currentState = GameState.StartXray10;
-                    Debug.Log("GameState.StartXray10 entered - Current State: " + currentState);
+                    currentState = GameState.StartXray13;
+                    Debug.Log("GameState.StartXray13 entered - Current State: " + currentState);
                     prompt.SetActive(true);
                     promptMessage.text = "Starte die Röntgenaufnahme.";
                     break;
                 }
 
-            case GameState.StartXray10:
+            case GameState.StartXray13:
                 
                 if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
-                    StartCoroutine(ShowHint(hintMessage, "StartXray10Text"));
+                    StartCoroutine(ShowHint(hintMessage, "StartXray13Text"));
                     break;
                 }
 
-                else if (actionItem.name != "StartXray10")
+                else if (actionItem.name != "StartXray13")
                 {
+                    Debug.Log("GameState.StartXray13: actionItem.name != StartXray13");
                     ScoreManager.Instance.IncreaseErrorScore(1);
                     StartCoroutine(ShowError(errorPanel));
                     break;
@@ -336,283 +513,66 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 break;
         }
     }
+
 
 
 
 
     // This function is called when the Panel is clicked
     public void OnPointerClick(PointerEventData eventData)
-    {
-        Debug.Log("Object clicked: " + actionItem.ToString());
-        switch (currentState)
-        {
-            case GameState.Choice01:
-            prompt.SetActive(true);
-            promptMessage.text = "Begib dich an den PC, um die Voreinstellungen für die Röntgenaufnahme vorzunehmen.";
-                if (actionItem.name == "showHint")
-                {
-                    ScoreManager.Instance.IncreaseHelpScore(1);
-                    PlayerPrefs.SetInt("FirstHintClick", 1);
-                    StartCoroutine(ShowHint(hintMessage, "StartText"));
-                    break;
-                }
+    {   
 
-                else if (actionItem.name != "PC_Sphere")
-                {
-                    ScoreManager.Instance.IncreaseErrorScore(1);
-                    StartCoroutine(ShowError(errorPanel));
-                    break;
-                }
-
-                else
-                {
-                    // currentState = GameState.Choice01;
-                    // Debug.Log("GameState.Choice02 entered - Current State: " + currentState);
-                    break;
-                }
-
-
-            case GameState.Choice02:
-                if (actionItem.name == "showHint")
-                {
-                    ScoreManager.Instance.IncreaseHelpScore(1);
-                    StartCoroutine(ShowHint(hintMessage, "Choice02Text"));
-                    break;
-                }
-
-                else
-                {
-                    // currentState = GameState.Choice03;
-                    // Debug.Log("GameState.Choice03 entered - Current State: " + currentState);
-                    break;
-                }                     
-
-            case GameState.Choice03:
-                if (actionItem.name == "showHint")
-                {
-                    ScoreManager.Instance.IncreaseHelpScore(1);
-                    StartCoroutine(ShowHint(hintMessage, "Choice03Text"));
-                    break;
-                }
-
-                else
-                {
-                    // currentState = GameState.Choice04;
-                    // Debug.Log("GameState.Choice04 entered - Current State: " + currentState);
-                    break;
-                }
-
-            case GameState.Choice04:
-                if (actionItem.name == "showHint")
-                {
-                    ScoreManager.Instance.IncreaseHelpScore(1);
-                    StartCoroutine(ShowHint(hintMessage, "Choice04Text"));
-                    break;
-                }
-
-                else
-                {
-                    // currentState = GameState.PostChoice05;
-                    // Debug.Log("GameState.PostChoice05 entered - Current State: " + currentState);
-                    break;
-                }
-            
-            case GameState.PostChoice05:
-                if (actionItem.name == "showHint")
-                {
-                    ScoreManager.Instance.IncreaseHelpScore(1);
-                    StartCoroutine(ShowHint(hintMessage, "PostChoice05Text"));
-                    break;
-                }
-
-                else
-                {
-                    currentState = GameState.RadiationProtection06;
-                    Debug.Log("GameState.RadiationProtection06 entered - Current State: " + currentState);
-                    break;
-                }
-
-            case GameState.RadiationProtection06:
-                Debug.Log("GameState.RadiationProtection06 CAAAAALEEEDD - Current State: " + currentState);
-                prompt.SetActive(true);
-                promptMessage.text = "Als nächstes benötigt der Patient einen Strahlenschutz.";
-                
-                if (actionItem.name == "showHint")
-                {
-                    ScoreManager.Instance.IncreaseHelpScore(1);
-                    StartCoroutine(ShowHint(hintMessage, "Als nächstes benötigt der Patient einen Strahlenschutz."));
-                    break;
-                }
-
-                else if (actionItem.name != "apronWallBlue")
-                {
-                    ScoreManager.Instance.IncreaseErrorScore(1);
-                    if (actionItem.activeInHierarchy)  // Check if the GameObject is active
-                    {
-                        StartCoroutine(ShowError(errorPanel));
-                    }
-                    break;
-                }
-
-                else
-                {
-                    currentState = GameState.XrayPositioning07;
-                    PlayerPrefs.SetInt("ShowMovementInstructions", 0);
-                    Debug.Log("GameState.XrayPositioning07 entered - Current State: " + currentState);
-                    prompt.SetActive(true);
-                    promptMessage.text = "Positioniere das Röntgengerät. Höhe 115 cm, Format 18x43.";
-                    break;
-                }
-                
-            case GameState.XrayPositioning07:
-                bool xrayPositioningCorrect = false;
-                
-
-                if (actionItem.name == "showHint")
-                {
-                    ScoreManager.Instance.IncreaseHelpScore(1);
-                    StartCoroutine(ShowHint(hintMessage, "Bevor es weitergeht, muss das Röntgengerät richtig positioniert werden. Höhe 115 cm, Format 18x43."));
-                    break;
-                }
-
-                else if (actionItem.name != "Frontplate")
-                {
-                    Debug.Log("IF1");
-                    ScoreManager.Instance.IncreaseErrorScore(1);
-                    StartCoroutine(ShowError(errorPanel));
-                    break;
-                }
-
-                else if ((PlayerPrefs.GetInt("CurrentMovementMark") == 1) && currentState == GameState.XrayPositioning07)
-                {
-                    if (moveXrayHead.Height == 115 && heightHandler.normalizedHeight == 18 && widthHandler.normalizedWidth == 43)
-                        xrayPositioningCorrect = true;
-
-                    if (xrayPositioningCorrect)
-                    {
-                        currentState = GameState.PlaceMarker08;
-                        moveXrayHead.heightPanel.SetActive(false);
-                        Debug.Log("GameState.PlaceMarker08 entered - Current State: " + currentState);
-                        break;
-                    }
-
-                    Debug.Log("Entered Routine for checking positioning: " + currentState);
-                    moveXrayHead.heightPanel.SetActive(true);
-                    widthHandler.widthPanel.SetActive(true);
-
-                    if (PlayerPrefs.GetInt("ShowMovementInstructions") != 0)
-                    {
-                        Debug.Log("IF2");
-
-                        ScoreManager.Instance.IncreaseErrorScore(1);
-                        StartCoroutine(ShowError(errorPanel));
-                        break;
-                    }
-
-                    else if (PlayerPrefs.GetInt("ShowMovementInstructions") == 0)
-                    {
-                        StartCoroutine(ShowMovementInstructions());
-                        PlayerPrefs.SetInt("ShowMovementInstructions", 1);
-                    }
-                }
-
-                else if (PlayerPrefs.GetInt("CurrentMovementMark") != 0)
-                {
-                    Debug.Log("IF3");
-                    ScoreManager.Instance.IncreaseErrorScore(1);
-                    StartCoroutine(ShowError(errorPanel));
-                    prompt.SetActive(true);
-                    promptMessage.text = "Platziere den Links-Rechts-Marker.";
-                    break;
-                }
-
-                break;
-
-            case GameState.PlaceMarker08:
-                
-                if (actionItem.name == "showHint")
-                {
-                    ScoreManager.Instance.IncreaseHelpScore(1);
-                    StartCoroutine(ShowHint(hintMessage, "PlaceMarker08Text"));
-                    break;
-                }
-
-                else if (actionItem.name != "PlaceMarker08")
-                {
-                    ScoreManager.Instance.IncreaseErrorScore(1);
-                    StartCoroutine(ShowError(errorPanel));
-                    break;
-                }
-
-                else
-                {
-                    currentState = GameState.LeaveRoom09;
-                    Debug.Log("GameState.LeaveRoom09 entered - Current State: " + currentState);
-                    prompt.SetActive(true);
-                    promptMessage.text = "Verlasse den Raum.";
-                    break;
-                }
-
-            case GameState.LeaveRoom09:
-                
-                if (actionItem.name == "showHint")
-                {
-                    ScoreManager.Instance.IncreaseHelpScore(1);
-                    StartCoroutine(ShowHint(hintMessage, "LeaveRoom09Text"));
-                    break;
-                }
-
-                else if (actionItem.name != "instructPatient07")
-                {
-                    ScoreManager.Instance.IncreaseErrorScore(1);
-                    StartCoroutine(ShowError(errorPanel));
-                    break;
-                }
-
-                else
-                {
-                    currentState = GameState.StartXray10;
-                    Debug.Log("GameState.StartXray10 entered - Current State: " + currentState);
-                    prompt.SetActive(true);
-                    promptMessage.text = "Starte die Röntgenaufnahme.";
-                    break;
-                }
-
-            case GameState.StartXray10:
-                
-                if (actionItem.name == "showHint")
-                {
-                    ScoreManager.Instance.IncreaseHelpScore(1);
-                    StartCoroutine(ShowHint(hintMessage, "StartXray10Text"));
-                    break;
-                }
-
-                else if (actionItem.name != "StartXray10")
-                {
-                    ScoreManager.Instance.IncreaseErrorScore(1);
-                    StartCoroutine(ShowError(errorPanel));
-                    break;
-                }
-                
-                else
-                {
-                    currentState = GameState.End;
-                    Debug.Log("GameState.End entered - Current State: " + currentState);
-                    break;
-                }
-
-            case GameState.End:
-                PlayerPrefs.SetInt("GameFinished", 1);
-                if (actionItem.name == "showHint")
-                {
-                    ScoreManager.Instance.IncreaseHelpScore(1);
-                    StartCoroutine(ShowHint(hintMessage, "Du hast das Ende des Demonstrators erreicht. Vielen Dank für's Spielen!"));
-                    break;
-                }
-                break;
-        }
     }
 
+    private void OnClickAction()
+    {
+        // Check if the player is in front of the Xray
+        if (PlayerPrefs.GetInt("CurrentMovementMark") != 1)
+        {
+            errorMessage.text = "Du muss dich am Röntgengerät befinden um Einstellungen vorzunehmen.";
+            StartCoroutine(ShowError(errorPanel));
+        }
+
+
+        // Check if the windowWidth is correct and move to next state
+        if (currentState == GameState.AdjustWindowWidth08)
+        {
+
+        }
+
+        // Check if the windowHeight is correct and move to next state
+        if (currentState == GameState.AdjustWindowHeight07)
+        {
+
+        }
+
+        // Check if the xrayHeight is correct and move to next state
+        if (currentState == GameState.AdjustXrayHeight09)
+        {
+            if (moveXrayHead.Height == 115)
+                heightCorrect = true;
+
+            if (heightCorrect)
+            {
+                currentState = GameState.AdjustXrayPosition10;
+                moveXrayHead.heightPanel.SetActive(false);
+                Debug.Log("GameState.AdjustXrayPosition10 entered - Current State: " + currentState);
+            }
+        }
+
+        // Check if the xrayPosition is correct
+        if (currentState == GameState.AdjustXrayPosition10)
+        {
+            
+        }
+
+        // Check if the everything is correct and move to next state
+        if (currentState == GameState.AdjustXrayPosition10 && windowHeightCorrect && windowWidthCorrect && xrayHeightCorrect && xrayPositionCorrect)
+        {
+            currentState = GameState.PlaceMarker11;
+            Debug.Log("GameState.PlaceMarker11 entered - Current State: " + currentState);
+        }
+    }
 
     public void ChangeGameState()
     {
@@ -636,6 +596,30 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 Debug.Log("GameState.PostChoice05 entered - Current State: " + currentState);
                 break;
         }
+    }
+
+    IEnumerator ShowWindowsizeInstructionHeight()
+    {
+        // show panel
+        windowsizeInstructionHeight.SetActive(true);
+
+        // wait for 5 seconds
+        yield return new WaitForSeconds(5f);
+
+        // hide panel
+        windowsizeInstructionHeight.SetActive(false);
+    }
+
+    IEnumerator ShowWindowsizeInstructionWidth()
+    {
+        // show panel
+        windowsizeInstructionWidth.SetActive(true);
+
+        // wait for 5 seconds
+        yield return new WaitForSeconds(5f);
+
+        // hide panel
+        windowsizeInstructionWidth.SetActive(false);
     }
 
     IEnumerator ShowMovementInstructions()
