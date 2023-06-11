@@ -29,6 +29,9 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
     bool windowWidthCorrect = false;
     bool xrayHeightCorrect = false;
     bool xrayPositionCorrect = false;
+    private CheckWindow checkWindow;
+    public GameObject widthPanel;
+
 
 
     // Define enum for game states
@@ -52,7 +55,8 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
 
     public void Start()
     {   
-        Debug.Log("GameState: " + currentState);
+        
+        Debug.Log("GameState: " + CurrentState);
         prompt.SetActive(true);
         promptMessage.text = "Begib dich an den PC, um Voreinstellungen für die Röntgenaufnahme vorzunehmen.";
         
@@ -66,6 +70,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
         moveXrayHead = FindObjectOfType<MoveXrayHead>();
         heightHandler = FindObjectOfType<HeightHandler>();
         widthHandler = FindObjectOfType<WidthHandler>();
+        checkWindow = FindObjectOfType<CheckWindow>();
 
         PlayerPrefs.SetInt("FirstHintClick", 0);
 
@@ -75,6 +80,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
             promptMessage.text = "Als nächstes benötigt der Patient einen Strahlenschutz.";
         }
     }
+
 
     public void OnMouseDown()
     {
@@ -193,12 +199,12 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
 
                 else
                 {
-                    currentState = GameState.AdjustWindowWidth08;
+                    currentState = GameState.AdjustWindowHeight07;
                     PlayerPrefs.SetInt("AdjustWindowWidth", 0);
                     PlayerPrefs.SetInt("AdjustWindowHeight", 0);
                     PlayerPrefs.SetInt("AdjustXrayHeight", 0);
                     PlayerPrefs.SetInt("AdjustXrayPosition", 0);
-                    Debug.Log("GameState.AdjustWindowWidth08 entered - Current State: " + currentState);
+                    Debug.Log("GameState.AdjustWindowHeight07 entered - Current State: " + currentState);
                     prompt.SetActive(true);
                     promptMessage.text = "Positioniere das Röntgengerät. Höhe 115 cm, Aufnahmeformat 18x43.";
                     break;
@@ -206,6 +212,17 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
 
             case GameState.AdjustWindowHeight07:
                 windowHeightCorrect = false;
+                windowsizeInstructionHeight.SetActive(true);
+                submitBtn.gameObject.SetActive(true);
+                submitBtn.onClick.AddListener(OnClickAction); // Check if height is correct and move to next state 
+                prompt.SetActive(true);
+                promptMessage.text = "AdjustWindowHeight07Text";
+
+                // Reset the boolean to avoid moving height and width at the same time
+                if (widthHandler.isBtnClicked)
+                {
+                    widthHandler.isBtnClicked = false;
+                }
 
                 // Show hint if user clicks on the hint button                    
                 if (actionItem.name == "showHint")
@@ -231,6 +248,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                     Debug.Log("AdjustWindowHeight07: PlayerPrefs.GetInt(AdjustWindowHeight) == 0");
 
                     StartCoroutine(ShowWindowsizeInstructionHeight());
+                    widthPanel.SetActive(true);
                     PlayerPrefs.SetInt("AdjustWindowHeight", 1);
                     break;
                 }
@@ -244,40 +262,48 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                     break;
                 }
 
-                // Check if height is correct and move to next state 
-                submitBtn.onClick.AddListener(OnClickAction);
-                moveXrayHead.heightPanel.SetActive(true);
-                submitBtn.gameObject.SetActive(true);
-
                 break;
 
 
             case GameState.AdjustWindowWidth08:
+                windowWidthCorrect = false;
+                windowsizeInstructionWidth.SetActive(true);
+                submitBtn.gameObject.SetActive(true);
+                submitBtn.onClick.AddListener(OnClickAction); // Check if windowWidth is correct and move to next state 
+                prompt.SetActive(true);
+                promptMessage.text = "AdjustWindowWidth08Text";
+
+                // Reset the boolean to avoid moving height and width at the same time
+                if (heightHandler.isBtnClicked)
+                {
+                    heightHandler.isBtnClicked = false;
+                }
 
                 // Show hint if user clicks on the hint button                    
                 if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
-                    StartCoroutine(ShowHint(hintMessage, "Stelle die Höhe des Aufnahmefensters auf 18 ein."));
+                    StartCoroutine(ShowHint(hintMessage, "Stelle die Breite des Aufnahmefensters auf 43 ein."));
                     break;
                 }
 
-                // Show error if user doesn't click on the left knob
+                // Show error if user doesn't click on the right knob
                 if (actionItem.name != "BtnRightGreen")
                 {
-                    Debug.Log("GameState.AdjustWindowWidth08: actionItem.name != BtnLeftGreen");
+                    Debug.Log("GameState.AdjustWindowWidth08: actionItem.name != BtnRightGreen");
                     Debug.Log("ActionItem: " + actionItem.name);
                     ScoreManager.Instance.IncreaseErrorScore(1);
                     StartCoroutine(ShowError(errorPanel));
                     break;
                 }
 
-                // Check if instruction for adjusting height has been shown
+                // Check if instruction for adjusting windowheight has been shown
                 if (PlayerPrefs.GetInt("AdjustWindowWidth") == 0)
                 {
                     Debug.Log("AdjustWindowWidth08: PlayerPrefs.GetInt(AdjustWindowWidth) == 0");
 
                     StartCoroutine(ShowWindowsizeInstructionWidth());
+                    widthPanel.SetActive(true);
                     PlayerPrefs.SetInt("AdjustWindowWidth", 1);
                     break;
                 }
@@ -291,9 +317,8 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                     break;
                 }
 
-                // Check if height is correct and move to next state 
+                // Check if width is correct and move to next state 
                 submitBtn.onClick.AddListener(OnClickAction);
-                moveXrayHead.heightPanel.SetActive(true);
                 submitBtn.gameObject.SetActive(true);
 
                 
@@ -310,55 +335,53 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
 
                 break;
 
-            
-
             case GameState.AdjustXrayHeight09:
                 xrayHeightCorrect = false;
+                submitBtn.gameObject.SetActive(true);
+                submitBtn.onClick.AddListener(OnClickAction); // Check if windowWidth is correct and move to next state 
+                prompt.SetActive(true);
+                promptMessage.text = "AdjustXrayHeight09Text";
                 
+                // Show hint if user clicks on the hint button  
                 if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
-                    StartCoroutine(ShowHint(hintMessage, "Um die Höhe auf 115 cm einzustellen, musst du den linken Drehknopf anwählen."));
+                    StartCoroutine(ShowHint(hintMessage, "Um die Höhe auf 115 cm einzustellen, musst du die Frontplatte anwählen. Nutze anschließend die Hoch/Runter Pfeiltasten um die Höhe einzustellen."));
                     break;
                 }
 
-                else if (actionItem.name != "BtnLeftGreen")
+                // Show error if user doesn't click on the Frontplate
+                if (actionItem.name != "Frontplate")
                 {
-                    Debug.Log("GameState.AdjustWindowWidth08: actionItem.name != BtnLeftGreen || actionItem.name != BtnRightGreen");
+                    Debug.Log("GameState.AdjustXrayHeight09: actionItem.name != Frontplate");
                     Debug.Log("ActionItem: " + actionItem.name);
                     ScoreManager.Instance.IncreaseErrorScore(1);
                     StartCoroutine(ShowError(errorPanel));
                     break;
                 }
-
-                Debug.Log("Entered Routine for adjusting height: " + currentState);
-
-                // Move to next state if height is correct
-                submitBtn.onClick.AddListener(OnClickAction);
-                moveXrayHead.heightPanel.SetActive(true);
-                submitBtn.gameObject.SetActive(true);
-
-                if (PlayerPrefs.GetInt("AdjustHeight") != 0)
+                
+                if (PlayerPrefs.GetInt("AdjustXrayHeight") != 0)
                 {
-                    Debug.Log("AdjustWindowWidth08: PlayerPrefs.GetInt(AdjustHeight) != 0");
+                    Debug.Log("AdjustXrayHeight09: PlayerPrefs.GetInt(AdjustXrayHeight) != 0");
 
                     ScoreManager.Instance.IncreaseErrorScore(1);
                     StartCoroutine(ShowError(errorPanel));
                     break;
                 }
 
-                else if (PlayerPrefs.GetInt("AdjustHeight") == 0)
+                // Check if instruction for adjusting xrayheight has been shown
+                if (PlayerPrefs.GetInt("AdjustXrayHeight") == 0)
                 {
-                    Debug.Log("AdjustWindowWidth08: PlayerPrefs.GetInt(AdjustHeight) == 0");
+                    Debug.Log("AdjustXrayHeight09: PlayerPrefs.GetInt(AdjustXrayHeight) == 0");
 
-                    StartCoroutine(ShowWindowsizeInstructionHeight());
-                    PlayerPrefs.SetInt("AdjustHeight", 1);
+                    StartCoroutine(ShowMovementInstructions());
+                    PlayerPrefs.SetInt("AdjustXrayHeight", 1);
                     break;
                 }
                 
-                else if (PlayerPrefs.GetInt("CurrentMovementMark") != 0)
+                if (PlayerPrefs.GetInt("CurrentMovementMark") != 0)
                 {
-                    Debug.Log("AdjustWindowWidth08: PlayerPrefs.GetInt(CurrentMovementMark) != 0");
+                    Debug.Log("AdjustXrayHeight09: PlayerPrefs.GetInt(CurrentMovementMark) != 0");
                     ScoreManager.Instance.IncreaseErrorScore(1);
                     StartCoroutine(ShowError(errorPanel));
                     prompt.SetActive(true);
@@ -370,53 +393,54 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
             
             case GameState.AdjustXrayPosition10:
                 xrayPositionCorrect = false;
+                submitBtn.gameObject.SetActive(true);
+                submitBtn.onClick.AddListener(OnClickAction); // Check if windowWidth is correct and move to next state 
+                prompt.SetActive(true);
+                promptMessage.text = "AdjustXrayPosition10Text";
                 
+                // Show hint if user clicks on the hint button
                 if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
                     StartCoroutine(ShowHint(hintMessage, "Um die Höhe auf 115 cm einzustellen, musst du den linken Drehknopf anwählen."));
                     break;
                 }
-
-                else if (actionItem.name != "BtnLeftGreen")
+                
+                // Show error if user doesn't click on the right knob
+                if (actionItem.name != "Frontplate")
                 {
-                    Debug.Log("GameState.AdjustWindowWidth08: actionItem.name != BtnLeftGreen || actionItem.name != BtnRightGreen");
+                    Debug.Log("GameState.AdjustXrayPosition10: actionItem.name != Frontplate");
                     Debug.Log("ActionItem: " + actionItem.name);
                     ScoreManager.Instance.IncreaseErrorScore(1);
                     StartCoroutine(ShowError(errorPanel));
                     break;
                 }
 
-                Debug.Log("Entered Routine for adjusting height: " + currentState);
-
                 // Move to next state if height is correct
                 submitBtn.onClick.AddListener(OnClickAction);
-                moveXrayHead.heightPanel.SetActive(true);
                 submitBtn.gameObject.SetActive(true);
 
-                if (moveXrayHead.Height == 115 && heightHandler.normalizedHeight == 18 && widthHandler.normalizedWidth == 43)
-
-                if (PlayerPrefs.GetInt("AdjustHeight") != 0)
+                if (PlayerPrefs.GetInt("AdjustXrayPosition") != 0)
                 {
-                    Debug.Log("AdjustWindowWidth08: PlayerPrefs.GetInt(AdjustHeight) != 0");
+                    Debug.Log("AdjustXrayPosition10: PlayerPrefs.GetInt(AdjustXrayPosition) != 0");
 
                     ScoreManager.Instance.IncreaseErrorScore(1);
                     StartCoroutine(ShowError(errorPanel));
                     break;
                 }
 
-                else if (PlayerPrefs.GetInt("AdjustHeight") == 0)
+                if (PlayerPrefs.GetInt("AdjustXrayPosition") == 0)
                 {
-                    Debug.Log("AdjustWindowWidth08: PlayerPrefs.GetInt(AdjustHeight) == 0");
+                    Debug.Log("AdjustXrayPosition10: PlayerPrefs.GetInt(AdjustXrayPosition) == 0");
 
-                    StartCoroutine(ShowWindowsizeInstructionHeight());
-                    PlayerPrefs.SetInt("AdjustHeight", 1);
+                    StartCoroutine(ShowMovementInstructions());
+                    PlayerPrefs.SetInt("AdjustXrayPosition", 1);
                     break;
                 }
                 
-                else if (PlayerPrefs.GetInt("CurrentMovementMark") != 0)
+                if (PlayerPrefs.GetInt("CurrentMovementMark") != 0)
                 {
-                    Debug.Log("AdjustWindowWidth08: PlayerPrefs.GetInt(CurrentMovementMark) != 0");
+                    Debug.Log("AdjustXrayPosition10: PlayerPrefs.GetInt(CurrentMovementMark) != 0");
                     ScoreManager.Instance.IncreaseErrorScore(1);
                     StartCoroutine(ShowError(errorPanel));
                     prompt.SetActive(true);
@@ -526,6 +550,8 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
 
     private void OnClickAction()
     {
+        Debug.Log("SubmitButton clicked");
+
         // Check if the player is in front of the Xray
         if (PlayerPrefs.GetInt("CurrentMovementMark") != 1)
         {
@@ -533,27 +559,40 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
             StartCoroutine(ShowError(errorPanel));
         }
 
+        // Check if the windowHeight is correct and move to next state
+        if (currentState == GameState.AdjustWindowHeight07)
+        {
+            if (heightHandler.normalizedHeight == 18)
+            {
+                windowHeightCorrect = true;
+                heightHandler.isBtnClicked = false;
+                currentState = GameState.AdjustWindowWidth08;
+                Debug.Log("GameState.AdjustWindowWidth08 entered - Current State: " + currentState);
+            }
+        }
 
         // Check if the windowWidth is correct and move to next state
         if (currentState == GameState.AdjustWindowWidth08)
         {
+            if (widthHandler.normalizedWidth == 43)
+            {
+                windowWidthCorrect = true;
+                widthHandler.isBtnClicked = false;
+                widthPanel.SetActive(false);
+                currentState = GameState.AdjustXrayHeight09;
+                moveXrayHead.heightPanel.SetActive(true); // Show the height panel
 
+                Debug.Log("GameState.AdjustXrayHeight09 entered - Current State: " + currentState);
+            }
         }
 
-        // Check if the windowHeight is correct and move to next state
-        if (currentState == GameState.AdjustWindowHeight07)
-        {
-
-        }
 
         // Check if the xrayHeight is correct and move to next state
         if (currentState == GameState.AdjustXrayHeight09)
         {
             if (moveXrayHead.Height == 115)
-                heightCorrect = true;
-
-            if (heightCorrect)
             {
+                xrayHeightCorrect = true;
                 currentState = GameState.AdjustXrayPosition10;
                 moveXrayHead.heightPanel.SetActive(false);
                 Debug.Log("GameState.AdjustXrayPosition10 entered - Current State: " + currentState);
@@ -563,7 +602,10 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
         // Check if the xrayPosition is correct
         if (currentState == GameState.AdjustXrayPosition10)
         {
-            
+            if (checkWindow.CheckPositioning())
+            {
+                xrayPositionCorrect = true;
+            }
         }
 
         // Check if the everything is correct and move to next state
@@ -573,6 +615,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
             Debug.Log("GameState.PlaceMarker11 entered - Current State: " + currentState);
         }
     }
+
 
     public void ChangeGameState()
     {
