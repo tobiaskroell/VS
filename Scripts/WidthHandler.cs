@@ -12,8 +12,19 @@ public class WidthHandler : MonoBehaviour
     public GameObject widthPanel;
 
     public float speed = 0.01f;
-    private bool isBtnClicked = false;
+    public bool isBtnClicked = false;
     public float normalizedWidth;
+    private HeightHandler heightHandler;
+
+    void Start()
+    {
+        heightHandler = GameObject.FindObjectOfType<HeightHandler>();
+        if (heightHandler.isBtnClicked)
+        {
+            heightHandler.isBtnClicked = false;
+        }
+        
+    }
 
     void Update()
     {
