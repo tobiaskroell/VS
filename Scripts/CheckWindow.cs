@@ -8,8 +8,6 @@ public class CheckWindow : MonoBehaviour
     public GameObject bottom;
     public GameObject left;
     public GameObject right;
-    public GameObject widthLabel1;
-    public GameObject widthLabel2;
 
     private bool correctPostioning_Top = false;
     private bool correctPostioning_Bottom = false;
