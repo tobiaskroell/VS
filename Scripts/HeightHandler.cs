@@ -10,10 +10,18 @@ public class HeightHandler : MonoBehaviour
     public GameObject btn;
     public GameObject widthPanel;
     public TextMeshProUGUI heightLabel2Text;
+    private WidthHandler widthHandler;
+    private GameManager gameManager;
 
     public float speed = 0.01f;
-    private bool isBtnClicked = false;
+    public bool isBtnClicked = false;
     public float normalizedHeight;
+
+    void Start()
+    {
+        widthHandler = GameObject.FindObjectOfType<WidthHandler>();
+        gameManager = GameObject.FindObjectOfType<GameManager>();
+    }
 
     void Update()
     {
@@ -23,7 +31,7 @@ public class HeightHandler : MonoBehaviour
         // Debug.Log(normalizedHeight);
         heightLabel2Text.text = normalizedHeight.ToString();
 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && gameManager.CurrentState == GameManager.GameState.AdjustWindowHeight07)
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
