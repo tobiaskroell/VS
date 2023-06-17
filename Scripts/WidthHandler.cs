@@ -15,14 +15,12 @@ public class WidthHandler : MonoBehaviour
     public bool isBtnClicked = false;
     public float normalizedWidth;
     private HeightHandler heightHandler;
+    private GameManager gameManager;
 
     void Start()
     {
         heightHandler = GameObject.FindObjectOfType<HeightHandler>();
-        if (heightHandler.isBtnClicked)
-        {
-            heightHandler.isBtnClicked = false;
-        }
+        gameManager = GameObject.FindObjectOfType<GameManager>();
         
     }
 
@@ -30,10 +28,11 @@ public class WidthHandler : MonoBehaviour
     {
         float width = Vector3.Distance(left.transform.position, right.transform.position);
 
-        normalizedWidth = Mathf.Round((width / 1.2f)*100);
+        normalizedWidth = Mathf.Round((width / 1.2f) * 100);
+        normalizedWidth = Mathf.Clamp(normalizedWidth, 22, 52);  // Constrain the value of normalizedWidth between 22 and 52.
         widthLabel1Text.text = normalizedWidth.ToString();
 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && gameManager.CurrentState == GameManager.GameState.AdjustWindowWidth08)
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
@@ -46,13 +45,30 @@ public class WidthHandler : MonoBehaviour
             }
         }
 
+        if (normalizedWidth <= 22 || normalizedWidth >= 52) // Check if normalizedWidth is 22 or 52
+        {
+            float scroll = Input.GetAxis("Mouse ScrollWheel");
+
+            // Check if the user is scrolling in the opposite direction
+            if ((normalizedWidth <= 22 && scroll > 0) || (normalizedWidth >= 52 && scroll < 0))
+            {
+                isBtnClicked = true; // Enable button click functionality
+            }
+            else
+            {
+                isBtnClicked = false; // Disable button click functionality
+                return; // Exit the Update method to prevent further movement
+            }
+        }
+
         if (isBtnClicked)
         {
-        float scroll = Input.GetAxis("Mouse ScrollWheel");
-        left.transform.position += Vector3.right * scroll * speed;
-        right.transform.position += Vector3.left * scroll * speed;
+            float scroll = Input.GetAxis("Mouse ScrollWheel");
+            left.transform.position += Vector3.right * scroll * speed;
+            right.transform.position += Vector3.left * scroll * speed;
         }
     }
+
 
     public void ActivateWidthHandler()
     {
