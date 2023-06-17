@@ -31,7 +31,8 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
     bool xrayPositionCorrect = false;
     private CheckWindow checkWindow;
     public GameObject widthPanel;
-
+    public MonoBehaviour moveXrayScript;
+    public MonoBehaviour moveXrayHeadScript;
 
 
     // Define enum for game states
@@ -219,9 +220,12 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 promptMessage.text = "AdjustWindowHeight07Text";
 
                 // Reset the boolean to avoid moving height and width at the same time
-                if (widthHandler.isBtnClicked)
+                if (widthHandler != null)
                 {
-                    widthHandler.isBtnClicked = false;
+                    if (widthHandler.isBtnClicked)
+                    {
+                        widthHandler.isBtnClicked = false;
+                    }
                 }
 
                 // Show hint if user clicks on the hint button                    
@@ -272,11 +276,14 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 submitBtn.onClick.AddListener(OnClickAction); // Check if windowWidth is correct and move to next state 
                 prompt.SetActive(true);
                 promptMessage.text = "AdjustWindowWidth08Text";
-
+                
                 // Reset the boolean to avoid moving height and width at the same time
-                if (heightHandler.isBtnClicked)
+                if (heightHandler != null)
                 {
-                    heightHandler.isBtnClicked = false;
+                    if (heightHandler.isBtnClicked)
+                    {
+                        heightHandler.isBtnClicked = false;
+                    }
                 }
 
                 // Show hint if user clicks on the hint button                    
@@ -374,7 +381,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 {
                     Debug.Log("AdjustXrayHeight09: PlayerPrefs.GetInt(AdjustXrayHeight) == 0");
 
-                    StartCoroutine(ShowMovementInstructions());
+                    
                     PlayerPrefs.SetInt("AdjustXrayHeight", 1);
                     break;
                 }
@@ -397,6 +404,12 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 submitBtn.onClick.AddListener(OnClickAction); // Check if windowWidth is correct and move to next state 
                 prompt.SetActive(true);
                 promptMessage.text = "AdjustXrayPosition10Text";
+
+                // Disable height adjustment
+                if (moveXrayHead.isHeightAdjustActive)
+                {
+                    moveXrayHead.isHeightAdjustActive = false;
+                }
                 
                 // Show hint if user clicks on the hint button
                 if (actionItem.name == "showHint")
@@ -540,6 +553,18 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
 
 
 
+    public void DisableScript(MonoBehaviour scriptToDisable)
+    {
+        if (scriptToDisable != null)
+        {
+            scriptToDisable.enabled = false;
+            Debug.Log("Script disabled: " + scriptToDisable.GetType().Name);
+        }
+        else
+        {
+            Debug.LogWarning("Script to disable is not assigned!");
+        }
+    }
 
 
     // This function is called when the Panel is clicked
@@ -551,6 +576,8 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
     private void OnClickAction()
     {
         Debug.Log("SubmitButton clicked");
+        Debug.Log("heightHandler.normalizedHeight: " + heightHandler.normalizedHeight);
+
 
         // Check if the player is in front of the Xray
         if (PlayerPrefs.GetInt("CurrentMovementMark") != 1)
@@ -567,8 +594,11 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 windowHeightCorrect = true;
                 heightHandler.isBtnClicked = false;
                 currentState = GameState.AdjustWindowWidth08;
+                windowsizeInstructionHeight.SetActive(false);
+                windowsizeInstructionWidth.SetActive(true);
                 Debug.Log("GameState.AdjustWindowWidth08 entered - Current State: " + currentState);
             }
+            
         }
 
         // Check if the windowWidth is correct and move to next state
@@ -581,7 +611,8 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 widthPanel.SetActive(false);
                 currentState = GameState.AdjustXrayHeight09;
                 moveXrayHead.heightPanel.SetActive(true); // Show the height panel
-
+                windowsizeInstructionWidth.SetActive(false);
+                xrayMovementInstruction.SetActive(true);
                 Debug.Log("GameState.AdjustXrayHeight09 entered - Current State: " + currentState);
             }
         }
@@ -595,6 +626,8 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 xrayHeightCorrect = true;
                 currentState = GameState.AdjustXrayPosition10;
                 moveXrayHead.heightPanel.SetActive(false);
+                DisableScript(moveXrayHeadScript);
+                xrayMovementInstruction.SetActive(true);
                 Debug.Log("GameState.AdjustXrayPosition10 entered - Current State: " + currentState);
             }
         }
@@ -612,6 +645,9 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
         if (currentState == GameState.AdjustXrayPosition10 && windowHeightCorrect && windowWidthCorrect && xrayHeightCorrect && xrayPositionCorrect)
         {
             currentState = GameState.PlaceMarker11;
+            submitBtn.gameObject.SetActive(false);
+            DisableScript(moveXrayScript);
+            xrayMovementInstruction.SetActive(false);
             Debug.Log("GameState.PlaceMarker11 entered - Current State: " + currentState);
         }
     }
@@ -635,8 +671,8 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 Debug.Log("GameState.Choice04 entered - Current State: " + currentState);
                 break;
             case GameManager.GameState.Choice04:
-                currentState = GameManager.GameState.PostChoice05;
-                Debug.Log("GameState.PostChoice05 entered - Current State: " + currentState);
+                currentState = GameManager.GameState.RadiationProtection06;
+                Debug.Log("GameState.RadiationProtection06 entered - Current State: " + currentState);
                 break;
         }
     }
