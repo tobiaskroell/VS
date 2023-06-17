@@ -9,9 +9,15 @@ public class MoveXrayHead : MonoBehaviour
     public float minY = -0.17f; // Minimum Y value
     public float maxY = 0.32f; // Maximum Y value
     public GameObject frontplate;
-    private bool isFrontplateClicked = false; // flag to know if frontplate was clicked
+    public bool isHeightAdjustActive = false; // flag to know if frontplate was clicked
     public GameObject heightPanel;
     public TextMeshProUGUI heightLabel;
+    private GameManager gameManager;
+
+    void Start()
+    {
+        gameManager = GameObject.FindObjectOfType<GameManager>();
+    }   
 
     // Calculated height of the xray head
     public float Height 
@@ -21,7 +27,7 @@ public class MoveXrayHead : MonoBehaviour
             // Normalize position between 0 (at minY) and 1 (at maxY)
             float normalizedPosition = (transform.position.y - minY) / (maxY - minY);
 
-            // Scale to desired range (40 to 150)
+            // Scale to desired range (50 to 150)
             return Mathf.Round(normalizedPosition * (150.0f - 50.0f) + 50.0f);
         }
     }
@@ -30,7 +36,7 @@ public class MoveXrayHead : MonoBehaviour
     void Update()
     {
         // Check if left mouse button is pressed
-        if(Input.GetMouseButtonDown(0))
+        if(Input.GetMouseButtonDown(0) && gameManager.CurrentState == GameManager.GameState.AdjustXrayHeight09)
         {
             // Create a ray from the camera going to the direction of the mouse
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -43,15 +49,13 @@ public class MoveXrayHead : MonoBehaviour
                 if(hit.collider.gameObject == frontplate)
                 {
                     // Set the flag to true
-                    isFrontplateClicked = true;
+                    isHeightAdjustActive = true;
                 }
             }
         }
 
-        if (isFrontplateClicked && PlayerPrefs.GetInt("CurrentMovementMark") == 1)
+        if (isHeightAdjustActive && PlayerPrefs.GetInt("CurrentMovementMark") == 1)
         {
-
-
             // Use Input.GetAxis to get player input
             float moveVertical = Input.GetAxis("Vertical"); // 'W'/'S' or up/down arrow
 
