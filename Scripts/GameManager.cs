@@ -31,8 +31,10 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
     bool xrayPositionCorrect = false;
     private CheckWindow checkWindow;
     public GameObject widthPanel;
-    public MonoBehaviour moveXrayScript;
-    public MonoBehaviour moveXrayHeadScript;
+    private MonoBehaviour moveXrayScript;
+    private MonoBehaviour moveXrayHeadScript;
+    public GameObject leftMarker;
+    public GameObject rightMarker;
 
 
     // Define enum for game states
@@ -464,6 +466,8 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 break;
 
             case GameState.PlaceMarker11:
+                prompt.SetActive(true);
+                promptMessage.text = "Platziere den Links-Rechts-Marker.";
                 
                 if (actionItem.name == "showHint")
                 {
@@ -472,7 +476,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                     break;
                 }
 
-                else if (actionItem.name != "PlaceMarker11")
+                if (actionItem.name != "leftMarker")
                 {
                     Debug.Log("GameState.PlaceMarker11: actionItem.name != PlaceMarker11");
                     ScoreManager.Instance.IncreaseErrorScore(1);
@@ -628,6 +632,8 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 moveXrayHead.heightPanel.SetActive(false);
                 DisableScript(moveXrayHeadScript);
                 xrayMovementInstruction.SetActive(true);
+                prompt.SetActive(true);
+                promptMessage.text = "AdjustXrayPosition10Text";
                 Debug.Log("GameState.AdjustXrayPosition10 entered - Current State: " + currentState);
             }
         }
@@ -648,6 +654,8 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
             submitBtn.gameObject.SetActive(false);
             DisableScript(moveXrayScript);
             xrayMovementInstruction.SetActive(false);
+            prompt.SetActive(true);
+            promptMessage.text = "PlaceMarker11Text";
             Debug.Log("GameState.PlaceMarker11 entered - Current State: " + currentState);
         }
     }
