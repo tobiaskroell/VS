@@ -7,24 +7,18 @@ public class CameraController : MonoBehaviour
     public float sensitivity = 5f;  // Mouse sensitivity for camera rotation
     public float moveSpeed = 5f;    // Speed for camera movement
     public float maxYAngle = 80f;   // Maximum vertical angle for camera rotation
+    public float zoomSpeed = 6f;    // Speed of zoom
+    public float minZoom = 40f;     // Minimum zoom amount
+    public float maxZoom = 70f;     // Maximum zoom amount
 
     private float rotationX = 0f;
     public bool isRightMouseButtonPressed = false;
+    private GameManager gameManager;
 
-    // Vector3 position = new Vector3(-1.305f, -0.486f, 1.258f);
-    // Quaternion rotation = Quaternion.Euler(31.4f, -90f, 0f);
-    // Camera mainCamera;
-
-    // private void Start()
-    // {
-    //     Camera mainCamera = Camera.main;
-
-    //     // Set position
-    //     mainCamera.transform.position = position;
-
-    //     // Set rotation
-    //     mainCamera.transform.rotation = rotation;
-    // }
+    private void Start()
+    {
+        gameManager = FindObjectOfType<GameManager>();
+    }
 
     private void Update()
     {
@@ -54,22 +48,15 @@ public class CameraController : MonoBehaviour
 
             // Apply rotation to the camera
             transform.localRotation = Quaternion.Euler(rotationX, transform.localRotation.eulerAngles.y, 0f);
-
-            // Get keyboard movement input
-            // float horizontal = Input.GetAxis("Horizontal") * moveSpeed * Time.deltaTime;
-            // float vertical = Input.GetAxis("Vertical") * moveSpeed * Time.deltaTime;
-
-            // Move the camera in the specified direction
-            // transform.Translate(new Vector3(horizontal, 0f, vertical));
-
-            // Move the camera up and down using the scroll wheel
-            // float scroll = Input.GetAxis("Mouse ScrollWheel") * moveSpeed * Time.deltaTime;
-            // transform.Translate(Vector3.up * scroll, Space.Self);
         }
+
+        if (!(gameManager.CurrentState == GameManager.GameState.AdjustWindowHeight07) && !(gameManager.CurrentState == GameManager.GameState.AdjustWindowWidth08) && !(gameManager.CurrentState == GameManager.GameState.AdjustXrayHeight09) && !(gameManager.CurrentState == GameManager.GameState.AdjustXrayPosition10))
+        {
+            // Zoom based on the input from the mouse scroll wheel
+            float scrollInput = Input.GetAxis("Mouse ScrollWheel");
+            Camera.main.fieldOfView -= scrollInput * zoomSpeed;
+            Camera.main.fieldOfView = Mathf.Clamp(Camera.main.fieldOfView, minZoom, maxZoom);
+        }
+        
     }
 }
-
-
-
-
-
