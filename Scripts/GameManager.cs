@@ -209,7 +209,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                     PlayerPrefs.SetInt("AdjustXrayPosition", 0);
                     Debug.Log("GameState.AdjustWindowHeight07 entered - Current State: " + currentState);
                     prompt.SetActive(true);
-                    promptMessage.text = "Positioniere das Röntgengerät. Höhe 115 cm, Aufnahmeformat 18x43.";
+                    promptMessage.text = "Stelle das Format des Aufnahmefensters korrekt ein (Aufnahmeformat 18x43). Klicke dazu auf den entsprechenden Regler am Röntgengerät.";
                     break;
                 }
 
@@ -219,7 +219,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 submitBtn.gameObject.SetActive(true);
                 submitBtn.onClick.AddListener(OnClickAction); // Check if height is correct and move to next state 
                 prompt.SetActive(true);
-                promptMessage.text = "AdjustWindowHeight07Text";
+                promptMessage.text = "Stelle das Format des Aufnahmefensters korrekt ein (Aufnahmeformat 18x43). Klicke dazu auf den entsprechenden Regler am Röntgengerät.";
 
                 // Reset the boolean to avoid moving height and width at the same time
                 if (widthHandler != null)
@@ -234,7 +234,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
-                    StartCoroutine(ShowHint(hintMessage, "Stelle die Höhe des Aufnahmefensters auf 18 ein."));
+                    StartCoroutine(ShowHint(hintMessage, "Stelle die Breite des Aufnahmefensters auf 18 ein. Benutze dazu den linken Drehregler."));
                     break;
                 }
 
@@ -277,7 +277,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 submitBtn.gameObject.SetActive(true);
                 submitBtn.onClick.AddListener(OnClickAction); // Check if windowWidth is correct and move to next state 
                 prompt.SetActive(true);
-                promptMessage.text = "AdjustWindowWidth08Text";
+                promptMessage.text = "Stelle die Länge des Aufnahmefensters auf 43 ein.";
                 
                 // Reset the boolean to avoid moving height and width at the same time
                 if (heightHandler != null)
@@ -292,7 +292,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
-                    StartCoroutine(ShowHint(hintMessage, "Stelle die Breite des Aufnahmefensters auf 43 ein."));
+                    StartCoroutine(ShowHint(hintMessage, "Stelle die Länge des Aufnahmefensters auf 43 ein. Benutze dazu den rechten Drehregler."));
                     break;
                 }
 
@@ -349,7 +349,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 submitBtn.gameObject.SetActive(true);
                 submitBtn.onClick.AddListener(OnClickAction); // Check if windowWidth is correct and move to next state 
                 prompt.SetActive(true);
-                promptMessage.text = "AdjustXrayHeight09Text";
+                promptMessage.text = "Stelle jetzt die Höhe des Röntgengeräts auf 115 cm ein. Klicke dazu auf die entsprechende Stelle am Röntgengerät.";
                 
                 // Show hint if user clicks on the hint button  
                 if (actionItem.name == "showHint")
@@ -405,7 +405,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 submitBtn.gameObject.SetActive(true);
                 submitBtn.onClick.AddListener(OnClickAction); // Check if windowWidth is correct and move to next state 
                 prompt.SetActive(true);
-                promptMessage.text = "AdjustXrayPosition10Text";
+                promptMessage.text = "Positioniere das Röntgenfenster über dem Patienten. Zum Positionieren klicke auf die entsprechende Stelle am Röntgengerät.";
 
                 // Disable height adjustment
                 if (moveXrayHead.isHeightAdjustActive)
