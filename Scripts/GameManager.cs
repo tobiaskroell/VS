@@ -104,8 +104,9 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 else if (actionItem.name != "PC_Sphere")
                 {
                     Debug.Log("GameState.Choice01: actionItem.name != PC_Sphere");
-                    ScoreManager.Instance.IncreaseErrorScore(1);
+                    errorMessage.text = "Begib dich an den PC.";
                     StartCoroutine(ShowError(errorPanel));
+                    ScoreManager.Instance.IncreaseErrorScore(1);
                     break;
                 }
 
@@ -125,6 +126,15 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                     break;
                 }
 
+                else if (actionItem.name != "PC_Sphere")
+                {
+                    Debug.Log("GameState.Choice01: actionItem.name != PC_Sphere");
+                    errorMessage.text = "Begib dich an den PC.";
+                    StartCoroutine(ShowError(errorPanel));
+                    ScoreManager.Instance.IncreaseErrorScore(1);
+                    break;
+                }
+
                 else
                 {
                     // currentState = GameState.Choice03;
@@ -140,6 +150,15 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                     break;
                 }
 
+                else if (actionItem.name != "PC_Sphere")
+                {
+                    Debug.Log("GameState.Choice01: actionItem.name != PC_Sphere");
+                    errorMessage.text = "Begib dich an den PC.";
+                    StartCoroutine(ShowError(errorPanel));
+                    ScoreManager.Instance.IncreaseErrorScore(1);
+                    break;
+                }
+
                 else
                 {
                     // currentState = GameState.Choice04;
@@ -152,6 +171,15 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
                     StartCoroutine(ShowHint(hintMessage, "Choice04Text"));
+                    break;
+                }
+
+                else if (actionItem.name != "PC_Sphere")
+                {
+                    Debug.Log("GameState.Choice01: actionItem.name != PC_Sphere");
+                    errorMessage.text = "Begib dich an den PC.";
+                    StartCoroutine(ShowError(errorPanel));
+                    ScoreManager.Instance.IncreaseErrorScore(1);
                     break;
                 }
 
@@ -195,6 +223,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                     if (actionItem.activeInHierarchy)  // Check if the GameObject is active
                     {
                         Debug.Log("GameState.RadiationProtection06: actionItem.name != apronWallBlue -> actionItem.activeInHierarchy");
+                        errorMessage.text = "Lege dem Patienten den Strahlenschutz an.";
                         StartCoroutine(ShowError(errorPanel));
                     }
                     break;
@@ -215,7 +244,6 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
 
             case GameState.AdjustWindowHeight07:
                 windowHeightCorrect = false;
-                windowsizeInstructionHeight.SetActive(true);
                 submitBtn.gameObject.SetActive(true);
                 submitBtn.onClick.AddListener(OnClickAction); // Check if height is correct and move to next state 
                 prompt.SetActive(true);
@@ -244,6 +272,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                     Debug.Log("GameState.AdjustWindowHeight07: actionItem.name != BtnLeftGreen");
                     Debug.Log("ActionItem: " + actionItem.name);
                     ScoreManager.Instance.IncreaseErrorScore(1);
+                    errorMessage.text = "Stelle die Breite des Aufnahmefensters auf 18 ein.";
                     StartCoroutine(ShowError(errorPanel));
                     break;
                 }
@@ -253,7 +282,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 {
                     Debug.Log("AdjustWindowHeight07: PlayerPrefs.GetInt(AdjustWindowHeight) == 0");
 
-                    StartCoroutine(ShowWindowsizeInstructionHeight());
+                    windowsizeInstructionHeight.SetActive(true);
                     widthPanel.SetActive(true);
                     PlayerPrefs.SetInt("AdjustWindowHeight", 1);
                     break;
@@ -273,7 +302,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
 
             case GameState.AdjustWindowWidth08:
                 windowWidthCorrect = false;
-                windowsizeInstructionWidth.SetActive(true);
+                windowsizeInstructionHeight.SetActive(false);
                 submitBtn.gameObject.SetActive(true);
                 submitBtn.onClick.AddListener(OnClickAction); // Check if windowWidth is correct and move to next state 
                 prompt.SetActive(true);
@@ -292,6 +321,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
+                    errorMessage.text = "Stelle die Länge des Aufnahmefensters auf 43 ein.";
                     StartCoroutine(ShowHint(hintMessage, "Stelle die Länge des Aufnahmefensters auf 43 ein. Benutze dazu den rechten Drehregler."));
                     break;
                 }
@@ -311,7 +341,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 {
                     Debug.Log("AdjustWindowWidth08: PlayerPrefs.GetInt(AdjustWindowWidth) == 0");
 
-                    StartCoroutine(ShowWindowsizeInstructionWidth());
+                    windowsizeInstructionWidth.SetActive(true);
                     widthPanel.SetActive(true);
                     PlayerPrefs.SetInt("AdjustWindowWidth", 1);
                     break;
@@ -366,6 +396,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                     Debug.Log("ActionItem: " + actionItem.name);
                     ScoreManager.Instance.IncreaseErrorScore(1);
                     StartCoroutine(ShowError(errorPanel));
+                    errorMessage.text = "Stelle die Höhe auf 115 cm ein.";
                     break;
                 }
                 
@@ -417,7 +448,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
-                    StartCoroutine(ShowHint(hintMessage, "Um die Höhe auf 115 cm einzustellen, musst du den linken Drehknopf anwählen."));
+                    StartCoroutine(ShowHint(hintMessage, "Um die Position des Röntgenfensters zu verändern, musst du die Frontplatte des Röntgengeräts anwählen. Nutze anschließend die Pfeiltasten um die Position zu verändern."));
                     break;
                 }
                 
@@ -427,6 +458,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                     Debug.Log("GameState.AdjustXrayPosition10: actionItem.name != Frontplate");
                     Debug.Log("ActionItem: " + actionItem.name);
                     ScoreManager.Instance.IncreaseErrorScore(1);
+                    errorMessage.text = "Positioniere das Röntgenfenster über dem Patienten.";
                     StartCoroutine(ShowError(errorPanel));
                     break;
                 }
@@ -480,6 +512,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 {
                     Debug.Log("GameState.PlaceMarker11: actionItem.name != PlaceMarker11");
                     ScoreManager.Instance.IncreaseErrorScore(1);
+                    errorMessage.text = "Der Links-Rechts-Marker ist noch nicht richtig positioniert.";
                     StartCoroutine(ShowError(errorPanel));
                     break;
                 }
@@ -489,7 +522,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                     currentState = GameState.LeaveRoom12;
                     Debug.Log("GameState.LeaveRoom12 entered - Current State: " + currentState);
                     prompt.SetActive(true);
-                    promptMessage.text = "Verlasse den Raum.";
+                    promptMessage.text = "Verlasse den Raum und begib dich an den PC.";
                     break;
                 }
 
@@ -502,10 +535,11 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                     break;
                 }
 
-                else if (actionItem.name != "LeaveRoom12")
+                else if (actionItem.name != "PC_Sphere")
                 {
                     Debug.Log("GameState.LeaveRoom12: actionItem.name != LeaveRoom12");
                     ScoreManager.Instance.IncreaseErrorScore(1);
+                    errorMessage.text = "Verlasse den Raum.";
                     StartCoroutine(ShowError(errorPanel));
                     break;
                 }
@@ -597,10 +631,16 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
             {
                 windowHeightCorrect = true;
                 heightHandler.isBtnClicked = false;
-                currentState = GameState.AdjustWindowWidth08;
                 windowsizeInstructionHeight.SetActive(false);
-                windowsizeInstructionWidth.SetActive(true);
                 Debug.Log("GameState.AdjustWindowWidth08 entered - Current State: " + currentState);
+                currentState = GameState.AdjustWindowWidth08;
+                // StartCoroutine(Delay());
+            }
+
+            else
+            {
+                errorMessage.text = "Die Breite des Fensters ist nicht korrekt. Versuche es erneut.";
+                StartCoroutine(ShowError(errorPanel));
             }
             
         }
@@ -618,6 +658,12 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 windowsizeInstructionWidth.SetActive(false);
                 xrayMovementInstruction.SetActive(true);
                 Debug.Log("GameState.AdjustXrayHeight09 entered - Current State: " + currentState);
+            }
+
+            else
+            {
+                errorMessage.text = "Die Länge des Fensters ist nicht korrekt. Versuche es erneut.";
+                StartCoroutine(ShowError(errorPanel));
             }
         }
 
@@ -684,6 +730,12 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 break;
         }
     }
+
+    // IEnumerator Delay()
+    // {
+    //     // wait for 1 seconds
+    //     yield return new WaitForSeconds(1f);
+    // }
 
     IEnumerator ShowWindowsizeInstructionHeight()
     {
