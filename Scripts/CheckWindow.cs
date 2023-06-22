@@ -16,7 +16,7 @@ public class CheckWindow : MonoBehaviour
 
     // Specific positions to check
     private Vector3 topMinPosition = new Vector3(-0.57f, 1.86f, -4.77f);
-    private Vector3 topMaxPosition = new Vector3(-0.59f, 1.88f, -4.79f);
+    private Vector3 topMaxPosition = new Vector3(-0.6f, 1.88f, -4.79f);
     private Vector3 bottomMinPosition = new Vector3(-0.57f, 1.86f, -4.24f);
     private Vector3 bottomMaxPosition = new Vector3(0.59f, 1.88f, -4.26f);
     private Vector3 leftMinPosition = new Vector3(-0.29f, 1.86f, -4.45f);
