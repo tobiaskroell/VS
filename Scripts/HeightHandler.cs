@@ -64,8 +64,8 @@ public class HeightHandler : MonoBehaviour
         if (isBtnClicked)
         {
             float scroll = Input.GetAxis("Mouse ScrollWheel");
-            top.transform.position += Vector3.forward * scroll * speed;
-            bottom.transform.position -= Vector3.forward * scroll * speed;
+            top.transform.position -= Vector3.forward * scroll * speed;
+            bottom.transform.position += Vector3.forward * scroll * speed;
         }
     }
 
