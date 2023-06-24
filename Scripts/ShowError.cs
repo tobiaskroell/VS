@@ -9,7 +9,7 @@ public class ShowError : MonoBehaviour
 {
     public GameObject errorPanel;
     public TextMeshProUGUI errorMessage;
-    private string message = "Falsche Antwort";
+    private string message = "Falsche Auswahl";
 
     // Start is called before the first frame update
     public void ShowError_()
