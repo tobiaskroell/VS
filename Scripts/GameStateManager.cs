@@ -32,6 +32,7 @@ public class GameStateManager : MonoBehaviour
             case GameManager.GameState.Choice04:
                 currentGameState = GameManager.GameState.PostChoice05;
                 Debug.Log("GameState.PostChoice05 entered - Current State: " + currentGameState);
+                PlayerPrefs.SetInt("PostChoice", 1);
                 break;
         }
     }
