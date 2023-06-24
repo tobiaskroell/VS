@@ -97,7 +97,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
                     PlayerPrefs.SetInt("FirstHintClick", 1);
-                    StartCoroutine(ShowHint(hintMessage, "StartText"));
+                    StartCoroutine(ShowHint(hintMessage, "Wähle die Körperregion entsprechend der Anforderung aus der Fallbeschreibung (Darstellung des proximalen Oberschenkels)."));
                     break;
                 }
 
@@ -122,18 +122,18 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
-                    StartCoroutine(ShowHint(hintMessage, "Choice02Text"));
+                    StartCoroutine(ShowHint(hintMessage, "Wähle das Körperteil entsprechend der Anforderung aus der Fallbeschreibung (Darstellung des proximalen Oberschenkels)."));
                     break;
                 }
 
-                else if (actionItem.name != "PC_Sphere")
-                {
-                    Debug.Log("GameState.Choice01: actionItem.name != PC_Sphere");
-                    errorMessage.text = "Begib dich an den PC.";
-                    StartCoroutine(ShowError(errorPanel));
-                    ScoreManager.Instance.IncreaseErrorScore(1);
-                    break;
-                }
+                // else if (actionItem.name != "PC_Sphere")
+                // {
+                //     Debug.Log("GameState.Choice01: actionItem.name != PC_Sphere");
+                //     errorMessage.text = "Begib dich an den PC.";
+                //     StartCoroutine(ShowError(errorPanel));
+                //     ScoreManager.Instance.IncreaseErrorScore(1);
+                //     break;
+                // }
 
                 else
                 {
@@ -146,18 +146,18 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
-                    StartCoroutine(ShowHint(hintMessage, "Choice03Text"));
+                    StartCoroutine(ShowHint(hintMessage, "Der Patient liegt flach auf dem Rücken - wähle die entsprechende Aufnahmetechnik. "));
                     break;
                 }
 
-                else if (actionItem.name != "PC_Sphere")
-                {
-                    Debug.Log("GameState.Choice01: actionItem.name != PC_Sphere");
-                    errorMessage.text = "Begib dich an den PC.";
-                    StartCoroutine(ShowError(errorPanel));
-                    ScoreManager.Instance.IncreaseErrorScore(1);
-                    break;
-                }
+                // else if (actionItem.name != "PC_Sphere")
+                // {
+                //     Debug.Log("GameState.Choice01: actionItem.name != PC_Sphere");
+                //     errorMessage.text = "Begib dich an den PC.";
+                //     StartCoroutine(ShowError(errorPanel));
+                //     ScoreManager.Instance.IncreaseErrorScore(1);
+                //     break;
+                // }
 
                 else
                 {
@@ -170,18 +170,18 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
-                    StartCoroutine(ShowHint(hintMessage, "Choice04Text"));
+                    StartCoroutine(ShowHint(hintMessage, "Die Aufnahmespannung für eine Röntgenaufnahme vom Oberschenkel liegt im Durchschnitt bei 73 kV. Der genaue Wert ist abhängig von Faktoren wie Körperstatur, Gewebedicke und gewünschter Bildqualität. "));
                     break;
                 }
 
-                else if (actionItem.name != "PC_Sphere")
-                {
-                    Debug.Log("GameState.Choice01: actionItem.name != PC_Sphere");
-                    errorMessage.text = "Begib dich an den PC.";
-                    StartCoroutine(ShowError(errorPanel));
-                    ScoreManager.Instance.IncreaseErrorScore(1);
-                    break;
-                }
+                // else if (actionItem.name != "PC_Sphere")
+                // {
+                //     Debug.Log("GameState.Choice01: actionItem.name != PC_Sphere");
+                //     errorMessage.text = "Begib dich an den PC.";
+                //     StartCoroutine(ShowError(errorPanel));
+                //     ScoreManager.Instance.IncreaseErrorScore(1);
+                //     break;
+                // }
 
                 else
                 {
@@ -208,12 +208,12 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
             case GameState.RadiationProtection06:
                 Debug.Log("GameState.RadiationProtection06 called - Current State: " + currentState);
                 prompt.SetActive(true);
-                promptMessage.text = "Als nächstes benötigt der Patient einen Strahlenschutz.";
+                promptMessage.text = "Um den Patienten vor der Röntgenstrahlung zu schützen, musst du ihm einen Strahlenschutz anlegen.";
                 
                 if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
-                    StartCoroutine(ShowHint(hintMessage, "Als nächstes benötigt der Patient einen Strahlenschutz. Lege ihm dazu die Bleischürze an, die an der Wand hängt."));
+                    StartCoroutine(ShowHint(hintMessage, "Klicke auf die blaue Bleischürze an der rechten Wand, um den Patienten vor der Röntgenstrahlung zu schützen."));
                     break;
                 }
 
@@ -223,7 +223,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                     if (actionItem.activeInHierarchy)  // Check if the GameObject is active
                     {
                         Debug.Log("GameState.RadiationProtection06: actionItem.name != apronWallBlue -> actionItem.activeInHierarchy");
-                        errorMessage.text = "Lege dem Patienten den Strahlenschutz an.";
+                        errorMessage.text = "Bevor du den Röntgenapparat einstellst, musst du die Strahlenschutzmaßnahmen beachten. Lege dem Patienten die Bleischürze an.";
                         StartCoroutine(ShowError(errorPanel));
                     }
                     break;
@@ -238,7 +238,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                     PlayerPrefs.SetInt("AdjustXrayPosition", 0);
                     Debug.Log("GameState.AdjustWindowHeight07 entered - Current State: " + currentState);
                     prompt.SetActive(true);
-                    promptMessage.text = "Stelle das Format des Aufnahmefensters korrekt ein (Aufnahmeformat 18x43). Klicke dazu auf den entsprechenden Regler am Röntgengerät.";
+                    promptMessage.text = "Als nächstes muss das Format des Aufnahmefensters korrekt eingestellt werden (Aufnahmeformat 18x43). Stelle die Breite des Aufnahmefensters auf 18 ein. Klicke dazu auf den entsprechenden Regler am Röntgengerät.";
                     break;
                 }
 
@@ -247,7 +247,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 submitBtn.gameObject.SetActive(true);
                 submitBtn.onClick.AddListener(OnClickAction); // Check if height is correct and move to next state 
                 prompt.SetActive(true);
-                promptMessage.text = "Stelle das Format des Aufnahmefensters korrekt ein (Aufnahmeformat 18x43). Klicke dazu auf den entsprechenden Regler am Röntgengerät.";
+                promptMessage.text = "Als nächstes muss das Format des Aufnahmefensters korrekt eingestellt werden (Aufnahmeformat 18x43). Stelle die Breite des Aufnahmefensters auf 18 ein. Klicke dazu auf den entsprechenden Regler am Röntgengerät.";
 
                 // Reset the boolean to avoid moving height and width at the same time
                 if (widthHandler != null)
@@ -262,7 +262,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 if (actionItem.name == "showHint")
                 {
                     ScoreManager.Instance.IncreaseHelpScore(1);
-                    StartCoroutine(ShowHint(hintMessage, "Stelle die Breite des Aufnahmefensters auf 18 ein. Benutze dazu den linken Drehregler."));
+                    StartCoroutine(ShowHint(hintMessage, "Klicke auf den linken Drehregler am Röntgengerät, um mittels Mausrad die Aufnahmebreite einzustellen. Klicke den rechten Drehregler, um die Aufnahmelänge einzustellen."));
                     break;
                 }
 
@@ -272,7 +272,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                     Debug.Log("GameState.AdjustWindowHeight07: actionItem.name != BtnLeftGreen");
                     Debug.Log("ActionItem: " + actionItem.name);
                     ScoreManager.Instance.IncreaseErrorScore(1);
-                    errorMessage.text = "Stelle die Breite des Aufnahmefensters auf 18 ein.";
+                    errorMessage.text = "Das Aufnahmefenster muss 18 cm breit sein. ";
                     StartCoroutine(ShowError(errorPanel));
                     break;
                 }
@@ -379,7 +379,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 submitBtn.gameObject.SetActive(true);
                 submitBtn.onClick.AddListener(OnClickAction); // Check if windowWidth is correct and move to next state 
                 prompt.SetActive(true);
-                promptMessage.text = "Stelle jetzt die Höhe des Röntgengeräts auf 115 cm ein. Klicke dazu auf die entsprechende Stelle am Röntgengerät.";
+                promptMessage.text = "Stelle die Höhe des Röntgengeräts auf 115 cm ein. Klicke dazu auf die entsprechende Stelle am Röntgengerät.";
                 
                 // Show hint if user clicks on the hint button  
                 if (actionItem.name == "showHint")
@@ -608,7 +608,12 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
     // This function is called when the Panel is clicked
     public void OnPointerClick(PointerEventData eventData)
     {   
-
+        if (PlayerPrefs.GetInt("PostChoice") == 1)
+        {
+            OnMouseDown();
+        }
+        else
+            Debug.Log("PlayerPrefs.GetInt(PostChoice) == 1 FALSE");
     }
 
     private void OnClickAction()
@@ -632,12 +637,12 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 windowHeightCorrect = true;
                 heightHandler.isBtnClicked = false;
                 windowsizeInstructionHeight.SetActive(false);
-                Debug.Log("GameState.AdjustWindowWidth08 entered - Current State: " + currentState);
                 currentState = GameState.AdjustWindowWidth08;
-                // StartCoroutine(Delay());
+                Debug.Log("GameState.AdjustWindowWidth08 entered - Current State: " + currentState);
+                PlayerPrefs.SetInt("AdjustWindowWidth08FirstEnter", 1); // This variable prevents showing error message when state changes to 08
             }
 
-            else
+            else if (heightHandler.normalizedHeight != 18 )
             {
                 errorMessage.text = "Die Breite des Fensters ist nicht korrekt. Versuche es erneut.";
                 StartCoroutine(ShowError(errorPanel));
@@ -657,14 +662,18 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 moveXrayHead.heightPanel.SetActive(true); // Show the height panel
                 windowsizeInstructionWidth.SetActive(false);
                 xrayMovementInstruction.SetActive(true);
+                prompt.SetActive(true);
+                promptMessage.text = "Stelle die Höhe des Röntgengeräts auf 115 cm ein. Klicke dazu auf die entsprechende Stelle am Röntgengerät.";
                 Debug.Log("GameState.AdjustXrayHeight09 entered - Current State: " + currentState);
             }
 
-            else
+            else if(PlayerPrefs.GetInt("AdjustWindowWidth08FirstEnter") != 1)
             {
                 errorMessage.text = "Die Länge des Fensters ist nicht korrekt. Versuche es erneut.";
                 StartCoroutine(ShowError(errorPanel));
             }
+
+            PlayerPrefs.SetInt("AdjustWindowWidth08FirstEnter", 0);
         }
 
 
@@ -679,7 +688,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 DisableScript(moveXrayHeadScript);
                 xrayMovementInstruction.SetActive(true);
                 prompt.SetActive(true);
-                promptMessage.text = "AdjustXrayPosition10Text";
+                promptMessage.text = "Als Aufnahmetechnik wurde die anterior-posteriore Aufnahme gewählt. Stelle die Position des Röntgenkopfes so ein, dass der Zentralstrahl entsprechend der Aufnahmetechnik ausgerichtet ist.";
                 Debug.Log("GameState.AdjustXrayPosition10 entered - Current State: " + currentState);
             }
         }
